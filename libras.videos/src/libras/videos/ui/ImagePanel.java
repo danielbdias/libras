@@ -23,7 +23,7 @@ public class ImagePanel extends JPanel
 	private Image image = null;
 
 	/**
-	 * Creates a new instace of this class with a specified dimension.
+	 * Creates a new instance of this class with a specified dimension.
 	 * @param size Size of this panel.
 	 */
 	public ImagePanel(Dimension size)
