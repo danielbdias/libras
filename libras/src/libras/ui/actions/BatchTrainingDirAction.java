@@ -4,6 +4,7 @@
 package libras.ui.actions;
 
 import java.io.*;
+import java.util.Hashtable;
 
 import libras.ui.actions.annotations.ActionDescription;
 
@@ -13,8 +14,9 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="batchdir",
-	commandExample="batchdir=[batchfile_dir_path]",
+	commandExample="batchdir -dir=[batchfile_dir_path]",
 	helpDescription="Executes a batch training for each batch file script found in the directory.",
+	requiredArgs= { "dir" },
 	needUserInput=true)
 public class BatchTrainingDirAction extends Action
 {
@@ -24,9 +26,9 @@ public class BatchTrainingDirAction extends Action
 	 * @param batchDir Directory where the training files are located. 
 	 * This directory must have only training files and subdirectory with more training files.
 	 */
-	public BatchTrainingDirAction(String batchDir) 
+	public BatchTrainingDirAction(Hashtable<String, String> arguments) 
 	{
-		this.batchDir = batchDir;
+		this.batchDir = arguments.get("dir");
 	}
 	
 	private String batchDir = null;

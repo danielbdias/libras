@@ -30,4 +30,6 @@ public @interface ActionDescription
 	 * Verifies if the action need an user input.
 	 */
 	boolean needUserInput() default false;
+	
+	String[] requiredArgs();
 }

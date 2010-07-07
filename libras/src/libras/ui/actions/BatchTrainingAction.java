@@ -3,6 +3,8 @@
  */
 package libras.ui.actions;
 
+import java.util.Hashtable;
+
 import libras.neuralnetworks.batches.*;
 import libras.ui.actions.annotations.ActionDescription;
 
@@ -12,11 +14,22 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="batchfile",
-	commandExample="batchfile=[batchfile_path]",
+	commandExample="batchfile -file=[batchfile_path]",
 	helpDescription="Executes a batch training based in the batch file script.",
+	requiredArgs={ "file" },
 	needUserInput=true)
 public class BatchTrainingAction extends Action
 {
+	/**
+	 * Creates a new instance of this action passing the batch file
+	 * with the configuration of the training
+	 * @param arguments Arguments of this action
+	 */
+	public BatchTrainingAction(Hashtable<String, String> arguments) 
+	{
+		this(arguments.get("file"));
+	}
+	
 	/**
 	 * Creates a new instance of this action passing the batch file
 	 * with the configuration of the training

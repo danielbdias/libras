@@ -16,6 +16,7 @@ import libras.utils.ReflectionHelper;
 @ActionDescription(
 	command="help",
 	commandExample="help",
+	requiredArgs = {},
 	helpDescription="Show help options")
 public class ShowHelpAction extends Action
 {

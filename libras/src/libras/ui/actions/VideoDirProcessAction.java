@@ -5,6 +5,7 @@ package libras.ui.actions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 import libras.images.Pixel;
@@ -18,8 +19,9 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="videodir",
-	commandExample="videodir=[video_dir_path]",
+	commandExample="-videodir -dir=[video_dir_path]",
 	helpDescription="Process a directory with videos with a libras gesture.",
+	requiredArgs= { "dir" },
 	needUserInput=true)
 public class VideoDirProcessAction extends Action
 {
@@ -28,9 +30,9 @@ public class VideoDirProcessAction extends Action
 	 * where the video files are located
 	 * @param videoDir Directory with videos to be processed.
 	 */
-	public VideoDirProcessAction(String videoDir)
+	public VideoDirProcessAction(Hashtable<String, String> arguments)
 	{
-		this.videoDir = videoDir;
+		this.videoDir = arguments.get("dir");
 	}
 	
 	private String videoDir = null;

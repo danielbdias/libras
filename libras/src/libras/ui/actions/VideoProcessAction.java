@@ -4,6 +4,7 @@
 package libras.ui.actions;
 
 import java.io.File;
+import java.util.Hashtable;
 
 import libras.images.Pixel;
 import libras.images.analysers.ColorSegmentationImageAnalyser;
@@ -16,20 +17,27 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="video", 
-	commandExample="video=[video_path]",
+	commandExample="-video -videoPath=[video_path] -frameDirectory=[frame_direcory] -centroidFile=[centroid_file]",
 	helpDescription="Process a video with a libras gesture.",
+	requiredArgs= { "videoPath", "frameDirectory", "centroidFile" },
 	needUserInput=true)
 public class VideoProcessAction extends Action
 {
 	/**
 	 * Creates a new instance of an video process action.
 	 */
-	public VideoProcessAction(String videoPath)
+	public VideoProcessAction(Hashtable<String, String> arguments)
 	{
-		this.videoPath = videoPath;
+		this.videoPath = arguments.get("videoPath");
+		this.frameDirectory = arguments.get("frameDirectory");
+		this.centroidFile = arguments.get("centroidFile");
 	}
 	
 	private String videoPath = null;
+	
+	private String frameDirectory = null;
+	
+	private String centroidFile = null;
 	
 	/**
 	 * Process the video assigned to this action.
@@ -38,9 +46,9 @@ public class VideoProcessAction extends Action
 	public void execute()
 	{
 		File videoFile = new File(this.videoPath);
-		File directoryToSave = new File(videoFile.getPath() + "\\" + videoFile.getName().substring(0, videoFile.getName().lastIndexOf('.')));
+		File directoryToSave = new File(this.frameDirectory);
 		
-		File centroidFile = new File(videoFile.getPath() + "\\" + videoFile.getName().substring(0, videoFile.getName().lastIndexOf('.')) + ".txt");
+		File centroidFile = new File(this.centroidFile);
 		
 		ColorSegmentationImageAnalyser analyser = new ColorSegmentationImageAnalyser(Pixel.RED, 175);
 		

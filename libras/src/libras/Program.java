@@ -66,15 +66,16 @@ public final class Program
 	protected static void executeActions(String[] args) throws Exception
 	{
 		ValidationHelper.validateIfParameterIsNull(args, "args");
-		
-		if (args.length != 1)
-			throw new InvalidParameterException("Only 1 (one) parameter must be passed to the program.");
+
+		for (int i = 0; i < args.length; i++) {
+			ValidationHelper.validateIfParameterIsNull(args[i], "args[" + i + "]");
+			
+			if (!args[i].startsWith("-"))
+				throw new InvalidParameterException("The " + i+1 + "rst parameter does not start with \"-\".");
+		}
 		
 		String argument = args[0];
 		argument = argument.toLowerCase();
-		
-		if (!argument.startsWith("-"))
-			throw new InvalidParameterException("The parameter does not start with \"-\".");
 		
 		//Removes the "-"
 		argument = argument.substring(1);
@@ -100,10 +101,32 @@ public final class Program
 						
 						if (description.needUserInput())
 						{
-							String userInput = identifyPathFromUserInput(argument, description.command());
-						
+							Hashtable<String, String> actionArgs = new Hashtable<String, String>();
+							
+							for (int i = 1; i < args.length; i++) {
+								int indexOfEqualChar = args[i].indexOf('=');
+
+								String argumentName = args[i].substring(0, indexOfEqualChar);
+								String argumentValue = args[i].substring(indexOfEqualChar+1);
+								
+								argumentName = argumentName.substring(1); // Remove the '-' character
+								
+								actionArgs.put(argumentName, argumentValue);
+							}
+							
+							if (description.requiredArgs() != null) {
+								for (int i = 0; i < description.requiredArgs().length; i++) {
+									String requiredArg = description.requiredArgs()[i];
+									
+									if (!actionArgs.containsKey(requiredArg))
+										throw new InvalidParameterException(
+											String.format("The action [%s] does not have the required argument [%s].", 
+												description.command(),
+												requiredArg));
+								}
+							}
 							Constructor<?> constructor = actionClass.getConstructor(String.class);
-							action = (Action) constructor.newInstance(userInput);
+							action = (Action) constructor.newInstance(actionArgs);
 						}
 						else
 						{
@@ -124,28 +147,7 @@ public final class Program
 		}
 	}
 	
-	/**
-	 * Provides a generic parameter recognition for a path.
-	 * @param input Input data of the user for a parameter
-	 * @param parameter Parameter used.
-	 */
-	private static String identifyPathFromUserInput(String input, String parameter)
-	{
-		String value = input;
-		
-		//Remove the parameter string from the start of the string.
-		if (value.startsWith(parameter)) 
-			value = value.substring(parameter.length());
-		
-		//Remove the "=" string from the start of the string.
-		if (value.startsWith("="))
-			value = value.substring(1);
-		
-		if (value.startsWith("\"") && value.endsWith("\""))
-			value = value.substring(1).substring(0, value.length() - 2);
-		
-		return value;
-	}
+	
 	
 	/**
 	 * Development tests of image processing project.

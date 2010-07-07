@@ -14,6 +14,7 @@ import libras.utils.Pair;
 @ActionDescription(
 	command="teste",
 	commandExample="teste",
+	requiredArgs={},
 	helpDescription="Test a functionality")
 public class TestAction extends Action
 {

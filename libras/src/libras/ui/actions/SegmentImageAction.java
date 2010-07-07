@@ -4,6 +4,7 @@
 package libras.ui.actions;
 
 import java.io.*;
+import java.util.Hashtable;
 
 import libras.images.Image;
 import libras.images.ImageIndexer;
@@ -17,14 +18,15 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 		command="segmentimage", 
-		commandExample="segmentimage=[image_to_be_segmented]",
+		commandExample="segmentimage -image=[image_to_be_segmented]",
 		helpDescription="Process an image identifying a object.",
+		requiredArgs= { "image" },
 		needUserInput=true)
 public class SegmentImageAction extends Action
 {
-	public SegmentImageAction(String imagePath)
+	public SegmentImageAction(Hashtable<String, String> arguments)
 	{
-		this.imagePath = imagePath;
+		this.imagePath = arguments.get("image");
 	}
 	
 	private String imagePath = null;
