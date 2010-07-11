@@ -1,6 +1,7 @@
 package libras.preprocessing;
 
 import java.io.File;
+import java.util.Date;
 
 import libras.images.Image;
 import libras.videos.FrameInterceptor;
@@ -37,7 +38,6 @@ public class VideoProcessChainAction extends ChainAction
 		libras.utils.ValidationHelper.validateIfParameterIsNull(videoFile, "videoFile");
 		libras.utils.ValidationHelper.validateIfParameterIsNull(directoryToSave, "directoryToSave");
 		libras.utils.ValidationHelper.validateIfFileParameterExists(videoFile, videoFile.getName());
-		libras.utils.ValidationHelper.validateIfFileParameterIsDirectory(directoryToSave);
 		
 		if (!directoryToSave.exists()) directoryToSave.mkdirs();
 		
@@ -55,7 +55,15 @@ public class VideoProcessChainAction extends ChainAction
 				}
 			});
 		
+		this.log("Processing video [%s]...", this.videoFile);
+		Date processStart = new Date(System.currentTimeMillis());
+		
 		processor.processVideo(this.videoFile);
+		
+		Date processEnd = new Date(System.currentTimeMillis());
+		long processDuration = processEnd.getTime() - processStart.getTime();
+		double processDurationInSeconds = processDuration / 1000.0; //convert in seconds
+		this.log("Video [%s] processed in [%f] seconds.", this.videoFile, processDurationInSeconds);
 	}
 	
 	private void internalInterceptFrame(Image frame)
@@ -67,5 +75,7 @@ public class VideoProcessChainAction extends ChainAction
 				this.framesIntercepted));
 		
 		libras.images.utils.ImageHelper.buildImage(frame, imageToSave);
+		
+		this.framesIntercepted++;
 	}
 }

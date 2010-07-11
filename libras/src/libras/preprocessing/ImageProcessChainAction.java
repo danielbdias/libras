@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Date;
 
 import libras.images.Image;
 import libras.images.ImageIndexer;
@@ -19,6 +20,13 @@ public class ImageProcessChainAction extends ChainAction
 		
 		initializeAttributes(frameDirectories, centroidFile, analyser);
 	}
+	
+	public ImageProcessChainAction(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, boolean saveSegmentedImage)
+	{
+		super();
+		
+		initializeAttributes(frameDirectories, centroidFile, analyser, saveSegmentedImage);
+	}
 
 	public ImageProcessChainAction(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, ChainAction nextAction)
 	{
@@ -29,11 +37,18 @@ public class ImageProcessChainAction extends ChainAction
 	
 	private File[] frameDirectories = null;
 	
+	private boolean saveSegmentedImage = false;
+	
 	private File centroidFile = null;
 	
 	private ColorSegmentationImageAnalyser analyser = null;
 	
 	private void initializeAttributes(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser)
+	{
+		this.initializeAttributes(frameDirectories, centroidFile, analyser, false);
+	}
+	
+	private void initializeAttributes(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, boolean saveSegmentedImage)
 	{
 		libras.utils.ValidationHelper.validateIfParameterIsNull(frameDirectories, "frameDirectories");
 		libras.utils.ValidationHelper.validateIfParameterIsNull(centroidFile, "centroidFile");
@@ -45,11 +60,13 @@ public class ImageProcessChainAction extends ChainAction
 			libras.utils.ValidationHelper.validateIfFileParameterExists(frameDirectory, frameDirectory.getName());	
 		}
 		
-		libras.utils.ValidationHelper.validateIfFileParameterIsFile(centroidFile);
+		if (centroidFile.exists())
+			libras.utils.ValidationHelper.validateIfFileParameterIsFile(centroidFile);
 		
 		this.frameDirectories = frameDirectories;
 		this.centroidFile = centroidFile;
 		this.analyser = analyser;
+		this.saveSegmentedImage = saveSegmentedImage;
 	}
 	
 	@Override
@@ -61,6 +78,9 @@ public class ImageProcessChainAction extends ChainAction
 			
 			for (File frameDirectory : this.frameDirectories)
 			{
+				this.log("Processing frame directory [%s]...", frameDirectory);
+				Date processStart = new Date(System.currentTimeMillis());
+				
 				File[] images = frameDirectory.listFiles(new FileFilter(){
 					@Override
 					public boolean accept(File arg) { return arg.getName().endsWith("jpg"); }
@@ -76,6 +96,13 @@ public class ImageProcessChainAction extends ChainAction
 				
 				String centroidFileLine = this.codifyLine(centroidList, frameDirectory.getName());
 				writer.write(centroidFileLine);
+				
+				this.log("[%d] frames processed.", images.length);
+				
+				Date processEnd = new Date(System.currentTimeMillis());
+				long processDuration = processEnd.getTime() - processStart.getTime();
+				double processDurationInSeconds = processDuration / 1000.0; //convert in seconds
+				this.log("Frame directory [%s] processed in [%f] seconds.", frameDirectory, processDurationInSeconds);
 			}
 			
 			if (writer != null) writer.close();
@@ -88,21 +115,21 @@ public class ImageProcessChainAction extends ChainAction
 
 	private int getFrameClass(String frameDirectoryName)
 	{
-		if (frameDirectoryName.endsWith("arcos_antihorario")) return 0; 
-		else if (frameDirectoryName.endsWith("arcos_horario")) return 1;
-		else if (frameDirectoryName.endsWith("balancar_curva")) return 2;
-		else if (frameDirectoryName.endsWith("balancar_vertical")) return 3;
-		else if (frameDirectoryName.endsWith("balancar_horizontal")) return 4;
-		else if (frameDirectoryName.endsWith("circulos")) return 5;
-		else if (frameDirectoryName.endsWith("curvas_superior")) return 6;
-		else if (frameDirectoryName.endsWith("curvas_inferior")) return 7;
-		else if (frameDirectoryName.endsWith("ondulatorio_horizontal")) return 8;
-		else if (frameDirectoryName.endsWith("ondulatorio_vertical")) return 9;
-		else if (frameDirectoryName.endsWith("reta_horizontal")) return 10;
-		else if (frameDirectoryName.endsWith("reta_vertical")) return 11;
-		else if (frameDirectoryName.endsWith("tremular")) return 12;
-		else if (frameDirectoryName.endsWith("ziguezague_horizontal")) return 13;
-		else if (frameDirectoryName.endsWith("ziguezague_vertical")) return 14;
+		if (frameDirectoryName.startsWith("arcos_antihorario")) return 1; 
+		else if (frameDirectoryName.startsWith("arcos_horario")) return 2;
+		else if (frameDirectoryName.startsWith("balancar_curva")) return 3;
+		else if (frameDirectoryName.startsWith("balancar_horizontal")) return 4;
+		else if (frameDirectoryName.startsWith("balancar_vertical")) return 5;
+		else if (frameDirectoryName.startsWith("circulos")) return 6;
+		else if (frameDirectoryName.startsWith("curvas_inferior")) return 7;
+		else if (frameDirectoryName.startsWith("curvas_superior")) return 8;
+		else if (frameDirectoryName.startsWith("ondulatorio_horizontal")) return 9;
+		else if (frameDirectoryName.startsWith("ondulatorio_vertical")) return 10;
+		else if (frameDirectoryName.startsWith("reta_horizontal")) return 11;
+		else if (frameDirectoryName.startsWith("reta_vertical")) return 12;
+		else if (frameDirectoryName.startsWith("tremular")) return 13;
+		else if (frameDirectoryName.startsWith("ziguezague_horizontal")) return 14;
+		else if (frameDirectoryName.startsWith("ziguezague_vertical")) return 15;
 		
 		return -1;
 	}
@@ -113,10 +140,15 @@ public class ImageProcessChainAction extends ChainAction
 		
 		for (Point centroid : centroidList)
 		{
-			line.append(centroid.getX());
-			line.append(',');
-			line.append(centroid.getY());
-			line.append(',');
+			if (centroid != null) {
+				line.append(centroid.getX());
+				line.append(',');
+				line.append(centroid.getY());
+				line.append(',');
+			}
+			else {
+				line.append("?,?,");
+			}
 		}
 		
 		line.append(this.getFrameClass(frameDirectoryName));
@@ -136,6 +168,16 @@ public class ImageProcessChainAction extends ChainAction
 		}
 		
 		ImageIndexer indexer = analyser.analyse(image);
+		
+		if (this.saveSegmentedImage)
+		{
+			File segmentedDirectory = new File(imageFile.getParent() + "_segmented");
+			if (!segmentedDirectory.exists()) segmentedDirectory.mkdir();
+			
+			File segmentedImage = new File(segmentedDirectory + "\\" + imageFile.getName());
+			
+			libras.images.utils.ImageHelper.buildImage(indexer, segmentedImage);
+		}
 		
 		return analyser.findCentroid(indexer);
 	}

@@ -17,7 +17,7 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="video", 
-	commandExample="-video -videoPath=[video_path] -frameDirectory=[frame_direcory] -centroidFile=[centroid_file]",
+	commandExample="-video -videoPath=[video_path] -frameDirectory=[frame_direcory] -centroidFile=[centroid_file] -saveSegmentedFrames",
 	helpDescription="Process a video with a libras gesture.",
 	requiredArgs= { "videoPath", "frameDirectory", "centroidFile" },
 	needUserInput=true)
@@ -28,9 +28,12 @@ public class VideoProcessAction extends Action
 	 */
 	public VideoProcessAction(Hashtable<String, String> arguments)
 	{
-		this.videoPath = arguments.get("videoPath");
-		this.frameDirectory = arguments.get("frameDirectory");
-		this.centroidFile = arguments.get("centroidFile");
+		this.videoPath = this.identifyPathInput(arguments.get("videoPath"));
+		this.frameDirectory = this.identifyPathInput(arguments.get("frameDirectory"));
+		this.centroidFile = this.identifyPathInput(arguments.get("centroidFile"));
+		
+		if (arguments.containsKey("saveSegmentedFrames"))
+			this.saveSegmentedFrames = true;
 	}
 	
 	private String videoPath = null;
@@ -38,6 +41,8 @@ public class VideoProcessAction extends Action
 	private String frameDirectory = null;
 	
 	private String centroidFile = null;
+	
+	private boolean saveSegmentedFrames = false;
 	
 	/**
 	 * Process the video assigned to this action.
@@ -53,14 +58,10 @@ public class VideoProcessAction extends Action
 		ColorSegmentationImageAnalyser analyser = new ColorSegmentationImageAnalyser(Pixel.RED, 175);
 		
 		VideoProcessChainAction videoProcess = new VideoProcessChainAction(videoFile, directoryToSave);
-		ImageProcessChainAction imageProcess = new ImageProcessChainAction(new File[] { directoryToSave }, centroidFile, analyser);
+		ImageProcessChainAction imageProcess = new ImageProcessChainAction(new File[] { directoryToSave }, centroidFile, analyser, this.saveSegmentedFrames);
 
 		videoProcess.setNextAction(imageProcess);
 		
-		System.out.println(String.format("Processing video: [%s] ...", videoFile.getAbsolutePath()));
-		
 		videoProcess.executeAction();
-		
-		System.out.println("Video processed.");
 	}
 }

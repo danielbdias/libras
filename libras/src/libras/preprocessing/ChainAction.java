@@ -32,4 +32,19 @@ public abstract class ChainAction
 	{
 		this.nextAction = nextAction;
 	}
+	
+	protected void log(String message)
+	{
+		this.log(message, (String) null);
+	}
+	
+	protected void log(String message, Object... args)
+	{
+		if (args == null || args.length == 0 || args[0] == null)
+			System.out.print(message);
+		else
+			System.out.format(message, args);
+		
+		System.out.println();
+	}
 }

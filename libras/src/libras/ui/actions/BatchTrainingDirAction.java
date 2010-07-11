@@ -6,7 +6,7 @@ package libras.ui.actions;
 import java.io.*;
 import java.util.Hashtable;
 
-import libras.ui.actions.annotations.ActionDescription;
+import libras.ui.actions.annotations.*;
 
 /**
  * Find training files in a directory and execute a training action for each file found. 

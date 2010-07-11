@@ -106,8 +106,17 @@ public final class Program
 							for (int i = 1; i < args.length; i++) {
 								int indexOfEqualChar = args[i].indexOf('=');
 
-								String argumentName = args[i].substring(0, indexOfEqualChar);
-								String argumentValue = args[i].substring(indexOfEqualChar+1);
+								String argumentName = null;
+								String argumentValue = null;
+								
+								if (indexOfEqualChar >= 0) {
+									argumentName = args[i].substring(0, indexOfEqualChar);
+									argumentValue = args[i].substring(indexOfEqualChar + 1);
+								}
+								else {
+									argumentName = args[i];
+									argumentValue = "";
+								}
 								
 								argumentName = argumentName.substring(1); // Remove the '-' character
 								
@@ -125,7 +134,7 @@ public final class Program
 												requiredArg));
 								}
 							}
-							Constructor<?> constructor = actionClass.getConstructor(String.class);
+							Constructor<?> constructor = actionClass.getConstructor(actionArgs.getClass());
 							action = (Action) constructor.newInstance(actionArgs);
 						}
 						else
@@ -137,17 +146,22 @@ public final class Program
 						{
 							java.text.DateFormat dfm = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 							
-							System.out.println(String.format("Executing process at [%s]...", dfm.format(new Date(System.currentTimeMillis()))));
+							Date processStart = new Date(System.currentTimeMillis());
+							System.out.println(String.format("Executing process at [%s]...", dfm.format(processStart)));
+							
 							action.execute();
-							System.out.println(String.format("Process executed at [%s].", dfm.format(new Date(System.currentTimeMillis()))));
+							
+							Date processEnd = new Date(System.currentTimeMillis());
+							long processDuration = processEnd.getTime() - processStart.getTime();
+							double processDurationInMinutes = processDuration / (1000.0 * 60); //convert in seconds
+							System.out.println(String.format("Process executed at [%s].", dfm.format(processEnd)));
+							System.out.println(String.format("This process took [%f] minutes to complete.", processDurationInMinutes));
 						}
 					}
 				}
 			}
 		}
 	}
-	
-	
 	
 	/**
 	 * Development tests of image processing project.

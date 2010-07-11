@@ -19,9 +19,9 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="videodir",
-	commandExample="-videodir -dir=[video_dir_path]",
-	helpDescription="Process a directory with videos with a libras gesture.",
-	requiredArgs= { "dir" },
+	commandExample="-videodir -dir=[video_dir_path] -centroidFile=[centroid_file_path] -frameDirectory=[frame_directory_path] -saveSegmentedFrames",
+	helpDescription="Process a directory which contains videos with a libras gesture.",
+	requiredArgs= { "dir", "centroidFile", "frameDirectory" },
 	needUserInput=true)
 public class VideoDirProcessAction extends Action
 {
@@ -33,9 +33,20 @@ public class VideoDirProcessAction extends Action
 	public VideoDirProcessAction(Hashtable<String, String> arguments)
 	{
 		this.videoDir = arguments.get("dir");
+		this.centroidFile = arguments.get("centroidFile");
+		this.frameDirectory = arguments.get("frameDirectory");
+		
+		if (arguments.containsKey("saveSegmentedFrames"))
+			this.saveSegmentedFrames = true;
 	}
 	
 	private String videoDir = null;
+	
+	private String centroidFile = null;
+	
+	private String frameDirectory = null;
+	
+	private boolean saveSegmentedFrames = false;
 	
 	/**
 	 * Show help to the user.
@@ -43,23 +54,31 @@ public class VideoDirProcessAction extends Action
 	 */
 	public void execute()
 	{	
-		File centroidFile = new File(this.videoDir + "\\centroids.txt");
+		File centroidFile = new File(this.centroidFile);
 		
 		ArrayList<File> videosToProcess = this.getVideos(this.videoDir, ".avi");
-		File[] directoriesToSave = new File[videosToProcess.size()];
+		File[] frameDirectories = new File[videosToProcess.size()];
+		
+		for (int i = 0; i < frameDirectories.length; i++) {
+			File videoToProcess = videosToProcess.get(i);
+			
+			String videoName = videoToProcess.getName();
+			frameDirectories[i] = new File(this.frameDirectory + "\\" + videoName.substring(0, videoName.lastIndexOf('.')));
+			frameDirectories[i].mkdir();
+		}
 		
 		ColorSegmentationImageAnalyser analyser = new ColorSegmentationImageAnalyser(Pixel.RED, 175);
 		
-		ImageProcessChainAction imageProcess = new ImageProcessChainAction(directoriesToSave, centroidFile, analyser);
+		ImageProcessChainAction imageProcess = new ImageProcessChainAction(frameDirectories, centroidFile, analyser, this.saveSegmentedFrames);
 		
 		LinkedList<VideoProcessChainAction> actions = new LinkedList<VideoProcessChainAction>();
 		
 		for (int i = 0; i < videosToProcess.size(); i++)
 		{
 			File videoToProcess = videosToProcess.get(i);
-			File directoryToSave = new File(videoToProcess.getPath() + "\\" + videoToProcess.getName().substring(0, videoToProcess.getName().lastIndexOf('.')));
+			File frameDirectory = frameDirectories[i];
 			
-			actions.add(new VideoProcessChainAction(videoToProcess, directoryToSave));
+			actions.add(new VideoProcessChainAction(videoToProcess, frameDirectory));
 		}
 		
 		for (int i = 1; i < actions.size(); i++)

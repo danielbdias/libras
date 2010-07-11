@@ -2,12 +2,12 @@ package libras.preprocessing;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import libras.utils.Pair;
 
-public class NormalizeRepresentationChainAction extends ChainAction
+public abstract class NormalizeRepresentationChainAction extends ChainAction
 {
 	public NormalizeRepresentationChainAction(File representationFile, File normalizedFile)
 	{
@@ -74,95 +74,40 @@ public class NormalizeRepresentationChainAction extends ChainAction
 		}
 	}
 
-	private String normalizeLine(String[] parsedLine)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	protected void normalizeCentroidListBySampling(List<Pair<Double, Double>> centroidList, int maxCentroidsPerList)
-	{
-		int keepOrder = centroidList.size() / maxCentroidsPerList;
+	protected String codifyLine(List<Pair<Double, Double>> centroids, int classNumber) {
+		StringBuilder builder = new StringBuilder();
 		
-		if (keepOrder > 0)
-		{
-			List<Pair<Double, Double>> tempList = new ArrayList<Pair<Double, Double>>();
+		for (Iterator<Pair<Double, Double>> iterator = centroids.iterator(); iterator.hasNext();) {
+			Pair<Double, Double> pair = iterator.next();
 			
-			//Add until fill the max number count
-			for (int i = 0; i < centroidList.size() && tempList.size() < maxCentroidsPerList; i+=keepOrder)
-				tempList.add(centroidList.get(i));
-			
-			if (tempList.size() < maxCentroidsPerList)
-			{
-				for (int i = maxCentroidsPerList - tempList.size(); i > 0; i--)
-					tempList.add(centroidList.get(centroidList.size() - i));
-			}
-			
-			centroidList.clear();
-			centroidList.addAll(tempList);
-		}
-	}
-
-	/**
-	 * Returns a normalized centroid list.
-	 */
-	protected List<Pair<Double, Double>> normalizeCentroidBySpace(List<Pair<Double, Double>> centroidList)
-	{
-		Pair<Pair<Double, Double>, Pair<Double, Double>> normalizationParameters =
-			this.getNormalizationParameters(centroidList);
-			
-		Pair<Double, Double> abcissaNormalizationParameter = normalizationParameters.getFirstElement();
-		Pair<Double, Double> ordinateNormalizationParameter = normalizationParameters.getSecondElement();
-		
-		ArrayList<Pair<Double, Double>> normalizedCentroidList = new ArrayList<Pair<Double,Double>>();
-
-		for (Pair<Double, Double> centroid : centroidList)
-		{
-			double abcissa = centroid.getFirstElement();
-			double ordinate = centroid.getSecondElement();
-			
-			abcissa = (abcissa - abcissaNormalizationParameter.getFirstElement()) / abcissaNormalizationParameter.getSecondElement();
-			ordinate = (ordinate - ordinateNormalizationParameter.getFirstElement()) / ordinateNormalizationParameter.getSecondElement();
-			
-			normalizedCentroidList.add(new Pair<Double, Double>(abcissa, ordinate));
+			builder.append(pair.getFirstElement());
+			builder.append(',');
+			builder.append(pair.getSecondElement());
+			builder.append(',');
 		}
 		
-		return normalizedCentroidList;
+		builder.append(classNumber);
+		
+		return builder.toString();
 	}
 	
-	private Pair<Pair<Double, Double>, Pair<Double, Double>> getNormalizationParameters(List<Pair<Double, Double>> centroidList)
-	{
-		double[] abcissaValues = new double[centroidList.size()];
-		double[] ordinateValues = new double[centroidList.size()];
+	protected List<Pair<Double, Double>> getCoordinatesFromParsedLine(
+			String[] parsedLine) {
+		List<Pair<Double, Double>> centroids = new ArrayList<Pair<Double,Double>>();
 		
-		for (int i = 0; i < centroidList.size(); i++)
-		{
-			Pair<Double, Double> point = centroidList.get(i);
+		for (int i = 0; i < parsedLine.length; i+=2) {
+			Double abcissa = Double.parseDouble(parsedLine[i]);
+			Double ordinate = Double.parseDouble(parsedLine[i+1]);
 			
-			abcissaValues[i] = point.getFirstElement();
-			ordinateValues[i] = point.getSecondElement();
+			centroids.add(new Pair<Double, Double>(abcissa, ordinate));
 		}
-		
-		Arrays.sort(abcissaValues);
-		Arrays.sort(ordinateValues);
-		
-		double abcissaMinimum = abcissaValues[0], abcissaMaximum = abcissaValues[abcissaValues.length-1];
-		
-		double ordinateMinimum = ordinateValues[0], ordinateMaximum = ordinateValues[ordinateValues.length-1];
-		
-		if (abcissaMinimum == abcissaMaximum)
-			abcissaMaximum = 1.0;
-		else
-			abcissaMaximum = abcissaMaximum - abcissaMinimum;
-		
-		if (ordinateMinimum == ordinateMaximum) 
-			ordinateMaximum = 1.0;
-		else
-			ordinateMaximum = ordinateMaximum - ordinateMinimum;
-		
-		return new Pair<Pair<Double, Double>, Pair<Double, Double>>(
-				new Pair<Double, Double>(abcissaMinimum, abcissaMaximum), 
-				new Pair<Double, Double>(ordinateMinimum, ordinateMaximum));
+		return centroids;
 	}
-
+	
+	protected int getClassNumberFromParsedLine(String[] parsedLine)
+	{
+		return Integer.parseInt(parsedLine[parsedLine.length-1]);
+	}
+	
+	protected abstract String normalizeLine(String[] parsedLine);
 }
