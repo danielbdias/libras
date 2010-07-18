@@ -49,6 +49,8 @@ public final class ImageHelper
 			}
 		}
 		
+		//renderedOp.dispose();
+		
 		return image;
 	}
 	/**

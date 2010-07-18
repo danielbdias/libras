@@ -64,29 +64,31 @@ public class VideoDirProcessAction extends Action
 			
 			String videoName = videoToProcess.getName();
 			frameDirectories[i] = new File(this.frameDirectory + "\\" + videoName.substring(0, videoName.lastIndexOf('.')));
-			frameDirectories[i].mkdir();
+			
+			if (!frameDirectories[i].exists()) frameDirectories[i].mkdir();
 		}
 		
 		ColorSegmentationImageAnalyser analyser = new ColorSegmentationImageAnalyser(Pixel.RED, 175);
 		
 		ImageProcessChainAction imageProcess = new ImageProcessChainAction(frameDirectories, centroidFile, analyser, this.saveSegmentedFrames);
+		imageProcess.executeAction();
 		
-		LinkedList<VideoProcessChainAction> actions = new LinkedList<VideoProcessChainAction>();
-		
-		for (int i = 0; i < videosToProcess.size(); i++)
-		{
-			File videoToProcess = videosToProcess.get(i);
-			File frameDirectory = frameDirectories[i];
-			
-			actions.add(new VideoProcessChainAction(videoToProcess, frameDirectory));
-		}
-		
-		for (int i = 1; i < actions.size(); i++)
-			actions.get(i-1).setNextAction(actions.get(i));
-		
-		actions.getLast().setNextAction(imageProcess);
-		
-		actions.getFirst().executeAction();
+//		LinkedList<VideoProcessChainAction> actions = new LinkedList<VideoProcessChainAction>();
+//		
+//		for (int i = 0; i < videosToProcess.size(); i++)
+//		{
+//			File videoToProcess = videosToProcess.get(i);
+//			File frameDirectory = frameDirectories[i];
+//			
+//			actions.add(new VideoProcessChainAction(videoToProcess, frameDirectory));
+//		}
+//		
+//		for (int i = 1; i < actions.size(); i++)
+//			actions.get(i-1).setNextAction(actions.get(i));
+//		
+//		actions.getLast().setNextAction(imageProcess);
+//		
+//		actions.getFirst().executeAction();
 	}
 	
 	private ArrayList<File> getVideos(String videoDir, String videoExtension)
