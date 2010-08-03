@@ -4,50 +4,48 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import libras.utils.Pair;
-
 public class NormalizeRepresentationBySizeChainAction extends
-		NormalizeRepresentationChainAction {
+		ProcessRepresentationChainAction {
 
 	public NormalizeRepresentationBySizeChainAction(File representationFile,
-			File normalizedFile, int normalizationSize) {
-		super(representationFile, normalizedFile);
+			File processedRepresentationFile, int representationSize, int normalizationSize) {
+		super(representationFile, processedRepresentationFile, representationSize);
 		this.normalizationSize = normalizationSize;
 	}
 
 	@Override
-	protected String normalizeLine(String[] parsedLine) {
-		List<Pair<Double, Double>> centroids = getCoordinatesFromParsedLine(parsedLine);
+	protected String processLine(String[] parsedLine) {
+		List<Double[]> representationList = this.getRepresentationFromParsedLine(parsedLine);
 		
-		this.normalizeCentroidListBySampling(centroids, this.normalizationSize);
+		this.normalizeRepresentationListBySampling(representationList, this.normalizationSize);
 		
 		int classNumber = Integer.parseInt(parsedLine[parsedLine.length-1]);
 			
-		return this.codifyLine(centroids, classNumber);
+		return this.codifyLine(representationList, classNumber);
 	}
 	
 	private int normalizationSize = 0;
 	
-	protected void normalizeCentroidListBySampling(List<Pair<Double, Double>> centroidList, int maxCentroidsPerList)
+	protected void normalizeRepresentationListBySampling(List<Double[]> representationList, int maxItemsPerList)
 	{
-		int keepOrder = centroidList.size() / maxCentroidsPerList;
+		int keepOrder = representationList.size() / maxItemsPerList;
 		
 		if (keepOrder > 0)
 		{
-			List<Pair<Double, Double>> tempList = new ArrayList<Pair<Double, Double>>();
+			List<Double[]> tempList = new ArrayList<Double[]>();
 			
 			//Add until fill the max number count
-			for (int i = 0; i < centroidList.size() && tempList.size() < maxCentroidsPerList; i+=keepOrder)
-				tempList.add(centroidList.get(i));
+			for (int i = 0; i < representationList.size() && tempList.size() < maxItemsPerList; i+=keepOrder)
+				tempList.add(representationList.get(i));
 			
-			if (tempList.size() < maxCentroidsPerList)
+			if (tempList.size() < maxItemsPerList)
 			{
-				for (int i = maxCentroidsPerList - tempList.size(); i > 0; i--)
-					tempList.add(centroidList.get(centroidList.size() - i));
+				for (int i = maxItemsPerList - tempList.size(); i > 0; i--)
+					tempList.add(representationList.get(representationList.size() - i));
 			}
 			
-			centroidList.clear();
-			centroidList.addAll(tempList);
+			representationList.clear();
+			representationList.addAll(tempList);
 		}
 	}
 }

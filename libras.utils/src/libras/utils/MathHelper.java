@@ -58,6 +58,27 @@ public final class MathHelper
 	}
 
 	/**
+	 * Calculates the Euclidean distance between two vectors.
+	 * @param firstVector First vector to be used.
+	 * @param secondVector Seconde vector to be used.
+	 * @return The distance between the two vectors.
+	 */
+	public static double euclideanDistance(Double[] firstVector, Double[] secondVector)
+	{
+		ValidationHelper.validateIfParameterIsNull(firstVector, "firstVector");
+		ValidationHelper.validateIfParameterIsNull(secondVector, "secondVector");
+		
+		ValidationHelper.validateIfArraysHaveSameLenght(firstVector.length, "firstVector", secondVector.length, "secondVector");
+			
+		double sum = 0;
+		
+		for (int i = 0; i < firstVector.length; i++)
+			sum +=  Math.pow(firstVector[i] - secondVector[i], 2);
+		
+		return  Math.sqrt(sum);
+	}
+	
+	/**
 	 * Sum two vectors.
 	 * @param firstVector First vector to be used.
 	 * @param secondVector Seconde vector to be used.

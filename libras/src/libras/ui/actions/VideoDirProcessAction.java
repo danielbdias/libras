@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
-import libras.images.Pixel;
-import libras.images.analysers.ColorSegmentationImageAnalyser;
 import libras.preprocessing.*;
 import libras.ui.actions.annotations.ActionDescription;
 
@@ -19,9 +17,9 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="videodir",
-	commandExample="-videodir -dir=[video_dir_path] -centroidFile=[centroid_file_path] -frameDirectory=[frame_directory_path] -saveSegmentedFrames",
+	commandExample="-videodir -dir=[video_dir_path] -frameDirectory=[frame_directory_path]",
 	helpDescription="Process a directory which contains videos with a libras gesture.",
-	requiredArgs= { "dir", "centroidFile", "frameDirectory" },
+	requiredArgs= { "dir", "frameDirectory" },
 	needUserInput=true)
 public class VideoDirProcessAction extends Action
 {
@@ -33,29 +31,19 @@ public class VideoDirProcessAction extends Action
 	public VideoDirProcessAction(Hashtable<String, String> arguments)
 	{
 		this.videoDir = arguments.get("dir");
-		this.centroidFile = arguments.get("centroidFile");
 		this.frameDirectory = arguments.get("frameDirectory");
-		
-		if (arguments.containsKey("saveSegmentedFrames"))
-			this.saveSegmentedFrames = true;
 	}
 	
 	private String videoDir = null;
 	
-	private String centroidFile = null;
-	
 	private String frameDirectory = null;
-	
-	private boolean saveSegmentedFrames = false;
 	
 	/**
 	 * Show help to the user.
 	 * @see libras.ui.actions.Action#execute()
 	 */
 	public void execute()
-	{	
-		File centroidFile = new File(this.centroidFile);
-		
+	{		
 		ArrayList<File> videosToProcess = this.getVideos(this.videoDir, ".avi");
 		File[] frameDirectories = new File[videosToProcess.size()];
 		
@@ -68,27 +56,20 @@ public class VideoDirProcessAction extends Action
 			if (!frameDirectories[i].exists()) frameDirectories[i].mkdir();
 		}
 		
-		ColorSegmentationImageAnalyser analyser = new ColorSegmentationImageAnalyser(Pixel.RED, 175);
+		LinkedList<VideoProcessChainAction> actions = new LinkedList<VideoProcessChainAction>();
 		
-		ImageProcessChainAction imageProcess = new ImageProcessChainAction(frameDirectories, centroidFile, analyser, this.saveSegmentedFrames);
-		imageProcess.executeAction();
+		for (int i = 0; i < videosToProcess.size(); i++)
+		{
+			File videoToProcess = videosToProcess.get(i);
+			File frameDirectory = frameDirectories[i];
+			
+			actions.add(new VideoProcessChainAction(videoToProcess, frameDirectory));
+		}
 		
-//		LinkedList<VideoProcessChainAction> actions = new LinkedList<VideoProcessChainAction>();
-//		
-//		for (int i = 0; i < videosToProcess.size(); i++)
-//		{
-//			File videoToProcess = videosToProcess.get(i);
-//			File frameDirectory = frameDirectories[i];
-//			
-//			actions.add(new VideoProcessChainAction(videoToProcess, frameDirectory));
-//		}
-//		
-//		for (int i = 1; i < actions.size(); i++)
-//			actions.get(i-1).setNextAction(actions.get(i));
-//		
-//		actions.getLast().setNextAction(imageProcess);
-//		
-//		actions.getFirst().executeAction();
+		for (int i = 1; i < actions.size(); i++)
+			actions.get(i-1).setNextAction(actions.get(i));
+		
+		actions.getFirst().executeAction();
 	}
 	
 	private ArrayList<File> getVideos(String videoDir, String videoExtension)

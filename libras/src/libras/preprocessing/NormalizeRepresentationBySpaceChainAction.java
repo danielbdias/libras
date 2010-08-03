@@ -8,83 +8,72 @@ import java.util.List;
 import libras.utils.Pair;
 
 public class NormalizeRepresentationBySpaceChainAction extends
-		NormalizeRepresentationChainAction {
+		ProcessRepresentationChainAction {
 
 	public NormalizeRepresentationBySpaceChainAction(File representationFile, 
-			File normalizedFile) {
-		super(representationFile, normalizedFile);
+			File processedRepresentationFile, int representationSize) {
+		super(representationFile, processedRepresentationFile, representationSize);
 	}
 	
 	@Override
-	protected String normalizeLine(String[] parsedLine) {
-		List<Pair<Double, Double>> centroids = getCoordinatesFromParsedLine(parsedLine);
+	protected String processLine(String[] parsedLine) {
+		List<Double[]> representationList = this.getRepresentationFromParsedLine(parsedLine);
 		
-		centroids = this.normalizeCentroidBySpace(centroids);
+		this.normalizeRepresentationListBySpace(representationList);
 		
 		int classNumber = Integer.parseInt(parsedLine[parsedLine.length-1]);
 			
-		return this.codifyLine(centroids, classNumber);
+		return this.codifyLine(representationList, classNumber);
 	}
 
 	/**
 	 * Returns a normalized centroid list.
 	 */
-	protected List<Pair<Double, Double>> normalizeCentroidBySpace(List<Pair<Double, Double>> centroidList)
+	protected void normalizeRepresentationListBySpace(List<Double[]> representationList)
 	{
-		Pair<Pair<Double, Double>, Pair<Double, Double>> normalizationParameters =
-			this.getNormalizationParameters(centroidList);
-			
-		Pair<Double, Double> abcissaNormalizationParameter = normalizationParameters.getFirstElement();
-		Pair<Double, Double> ordinateNormalizationParameter = normalizationParameters.getSecondElement();
-		
-		ArrayList<Pair<Double, Double>> normalizedCentroidList = new ArrayList<Pair<Double,Double>>();
+		List<Pair<Double, Double>> normalizationParameters =
+			this.getNormalizationParameters(representationList);
 
-		for (Pair<Double, Double> centroid : centroidList)
+		for (Double[] representation : representationList)
 		{
-			double abcissa = centroid.getFirstElement();
-			double ordinate = centroid.getSecondElement();
-			
-			abcissa = (abcissa - abcissaNormalizationParameter.getFirstElement()) / abcissaNormalizationParameter.getSecondElement();
-			ordinate = (ordinate - ordinateNormalizationParameter.getFirstElement()) / ordinateNormalizationParameter.getSecondElement();
-			
-			normalizedCentroidList.add(new Pair<Double, Double>(abcissa, ordinate));
+			for (int i = 0; i < representation.length; i++) {
+				Pair<Double, Double> normalizationParameter = normalizationParameters.get(i);
+				
+				double min = normalizationParameter.getFirstElement();
+				double max = normalizationParameter.getSecondElement();
+				double value = representation[i];
+				
+				representation[i] = (value - min) / max;
+			}
 		}
-		
-		return normalizedCentroidList;
 	}
 	
-	private Pair<Pair<Double, Double>, Pair<Double, Double>> getNormalizationParameters(List<Pair<Double, Double>> centroidList)
+	private List<Pair<Double, Double>> getNormalizationParameters(List<Double[]> representationList)
 	{
-		double[] abcissaValues = new double[centroidList.size()];
-		double[] ordinateValues = new double[centroidList.size()];
+		List<Pair<Double, Double>> normalizationParameters = new ArrayList<Pair<Double,Double>>();
 		
-		for (int i = 0; i < centroidList.size(); i++)
-		{
-			Pair<Double, Double> point = centroidList.get(i);
+		for (int dimension = 0; dimension < this.getRepresentationSize(); dimension++) {
+			Double[] values = new Double[representationList.size()];
 			
-			abcissaValues[i] = point.getFirstElement();
-			ordinateValues[i] = point.getSecondElement();
+			for (int j = 0; j < values.length; j++) {
+				Double[] representation = representationList.get(j);
+				
+				values[j] = representation[dimension]; 
+			}
+			
+			Arrays.sort(values);
+			
+			double minimum = values[0];
+			double maximum = values[values.length-1];
+			
+			if (minimum == maximum)
+				maximum = 1.0;
+			else
+				maximum = maximum - minimum;
+			
+			normalizationParameters.add(new Pair<Double, Double>(minimum, maximum));
 		}
 		
-		Arrays.sort(abcissaValues);
-		Arrays.sort(ordinateValues);
-		
-		double abcissaMinimum = abcissaValues[0], abcissaMaximum = abcissaValues[abcissaValues.length-1];
-		
-		double ordinateMinimum = ordinateValues[0], ordinateMaximum = ordinateValues[ordinateValues.length-1];
-		
-		if (abcissaMinimum == abcissaMaximum)
-			abcissaMaximum = 1.0;
-		else
-			abcissaMaximum = abcissaMaximum - abcissaMinimum;
-		
-		if (ordinateMinimum == ordinateMaximum) 
-			ordinateMaximum = 1.0;
-		else
-			ordinateMaximum = ordinateMaximum - ordinateMinimum;
-		
-		return new Pair<Pair<Double, Double>, Pair<Double, Double>>(
-				new Pair<Double, Double>(abcissaMinimum, abcissaMaximum), 
-				new Pair<Double, Double>(ordinateMinimum, ordinateMaximum));
+		return normalizationParameters;
 	}
 }
