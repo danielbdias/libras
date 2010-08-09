@@ -27,6 +27,13 @@ public class ImageProcessChainAction extends ChainAction
 		
 		initializeAttributes(frameDirectories, centroidFile, analyser, saveSegmentedImage);
 	}
+	
+	public ImageProcessChainAction(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, boolean saveSegmentedImage, File[] segmentedImageDirecories)
+	{
+		super();
+		
+		initializeAttributes(frameDirectories, centroidFile, analyser, saveSegmentedImage, segmentedImageDirecories);
+	}
 
 	public ImageProcessChainAction(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, ChainAction nextAction)
 	{
@@ -41,6 +48,8 @@ public class ImageProcessChainAction extends ChainAction
 	
 	private File centroidFile = null;
 	
+	private File[] segmentedFrameDirectories = null;
+	
 	private ColorSegmentationImageAnalyser analyser = null;
 	
 	private void initializeAttributes(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser)
@@ -49,6 +58,11 @@ public class ImageProcessChainAction extends ChainAction
 	}
 	
 	private void initializeAttributes(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, boolean saveSegmentedImage)
+	{
+		this.initializeAttributes(frameDirectories, centroidFile, analyser, saveSegmentedImage, null);
+	}
+	
+	private void initializeAttributes(File[] frameDirectories, File centroidFile, ColorSegmentationImageAnalyser analyser, boolean saveSegmentedImage, File[] segmentedFrameDirectories)
 	{
 		libras.utils.ValidationHelper.validateIfParameterIsNull(frameDirectories, "frameDirectories");
 		libras.utils.ValidationHelper.validateIfParameterIsNull(centroidFile, "centroidFile");
@@ -67,6 +81,7 @@ public class ImageProcessChainAction extends ChainAction
 		this.centroidFile = centroidFile;
 		this.analyser = analyser;
 		this.saveSegmentedImage = saveSegmentedImage;
+		this.segmentedFrameDirectories = segmentedFrameDirectories;
 	}
 	
 	@Override
@@ -76,8 +91,11 @@ public class ImageProcessChainAction extends ChainAction
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(this.centroidFile));
 			
-			for (File frameDirectory : this.frameDirectories)
+			for (int i = 0; i < this.frameDirectories.length; i++)
 			{
+				File frameDirectory = this.frameDirectories[i];
+				File segmentedFrameDirectory = (this.segmentedFrameDirectories != null ? this.segmentedFrameDirectories[i] : null);
+				
 				this.log("Processing frame directory [%s]...", frameDirectory);
 				Date processStart = new Date(System.currentTimeMillis());
 				
@@ -90,7 +108,7 @@ public class ImageProcessChainAction extends ChainAction
 				
 				for (File image : images)
 				{
-					libras.images.Point centroid = getCentroid(image);
+					libras.images.Point centroid = getCentroid(image, segmentedFrameDirectory);
 					centroidList.add(centroid);
 				}
 				
@@ -157,7 +175,7 @@ public class ImageProcessChainAction extends ChainAction
 		return line.toString();
 	}
 
-	private Point getCentroid(File imageFile)
+	private Point getCentroid(File imageFile, File segmentedFrameDirectory)
 	{
 		Image image = null;
 		
@@ -171,8 +189,15 @@ public class ImageProcessChainAction extends ChainAction
 		
 		if (this.saveSegmentedImage)
 		{
-			File segmentedDirectory = new File(imageFile.getParent() + "_segmented");
-			if (!segmentedDirectory.exists()) segmentedDirectory.mkdir();
+			File segmentedDirectory = null;
+			
+			if (segmentedFrameDirectory != null)
+				segmentedDirectory = segmentedFrameDirectory;
+			else
+				segmentedDirectory = new File(imageFile.getParent() + "_segmented");
+			
+			if (!segmentedDirectory.exists()) 
+				segmentedDirectory.mkdirs();
 			
 			File segmentedImage = new File(segmentedDirectory + "\\" + imageFile.getName());
 			

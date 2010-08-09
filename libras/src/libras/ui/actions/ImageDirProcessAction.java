@@ -18,7 +18,7 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="imagedir",
-	commandExample="-imagedir -dir=[image_dir_path] -centroidFile=[centroid_file_path] -saveSegmentedFrames",
+	commandExample="-imagedir -dir=[image_dir_path] -centroidFile=[centroid_file_path] -saveSegmentedFrames -segmentedImageDir=[segmented_image_dir_path]",
 	helpDescription="Process a directory which contains videos with a libras gesture.",
 	requiredArgs= { "dir", "centroidFile" },
 	needUserInput=true)
@@ -35,7 +35,11 @@ public class ImageDirProcessAction extends Action
 		this.centroidFile = arguments.get("centroidFile");
 		
 		if (arguments.containsKey("saveSegmentedFrames"))
+		{
 			this.saveSegmentedFrames = true;
+			if (arguments.containsKey("segmentedImageDir"))
+				this.segmentedImageDir = arguments.get("segmentedImageDir");
+		}
 	}
 	
 	private String imageDir = null;
@@ -43,6 +47,8 @@ public class ImageDirProcessAction extends Action
 	private String centroidFile = null;
 	
 	private boolean saveSegmentedFrames = false;
+	
+	private String segmentedImageDir = null;
 	
 	/**
 	 * Show help to the user.
@@ -53,6 +59,16 @@ public class ImageDirProcessAction extends Action
 		File centroidFile = new File(this.centroidFile);
 		
 		File[] frameDirectories = this.getImagesDirectories(this.imageDir);
+		File[] segmentedImageDirectories = null;
+		
+		if (this.saveSegmentedFrames && this.segmentedImageDir != null)
+		{
+			segmentedImageDirectories = new File[frameDirectories.length];
+			
+			for (int i = 0; i < frameDirectories.length; i++) {
+				segmentedImageDirectories[i] = new File(this.segmentedImageDir + "\\" + frameDirectories[i].getName());
+			}
+		}
 		
 		ColorSegmentationImageAnalyser analyser = new ColorSegmentationImageAnalyser(Pixel.RED, 175);
 		
@@ -61,7 +77,8 @@ public class ImageDirProcessAction extends Action
 				frameDirectories, 
 				centroidFile, 
 				analyser, 
-				this.saveSegmentedFrames);
+				this.saveSegmentedFrames,
+				segmentedImageDirectories);
 		
 		imageProcess.executeAction();
 	}

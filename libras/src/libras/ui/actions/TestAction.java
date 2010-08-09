@@ -1,10 +1,15 @@
 package libras.ui.actions;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
-import libras.preprocessing.VideoProcessChainAction;
+import libras.preprocessing.RepresentationBuilderChainAction;
+import libras.preprocessing.representation.AbcissaAngleDimensionBuilder;
+import libras.preprocessing.representation.AbcissaCoordinateDimensionBuilder;
+import libras.preprocessing.representation.DimensionBuilder;
+import libras.preprocessing.representation.InstantVelocityDimensionBuilder;
+import libras.preprocessing.representation.OrdinateAngleDimensionBuilder;
+import libras.preprocessing.representation.OrdinateCoordinateDimensionBuilder;
 import libras.ui.actions.annotations.ActionDescription;
 
 /**
@@ -20,91 +25,62 @@ public class TestAction extends Action
 {
 	@Override
 	public void execute() throws Exception
-	{	
-		//TODO: recriar videos de ziguezague
-//		String[] videoDirs = { 
-//				"H:\\Daniel\\Videos\\Base de dados - Movimentos Libras\\Base TCC\\Alex",
-//				};
-//		String frameDirectory = "D:\\Daniel Documents\\Facul\\TCC\\Base de dados\\Base nova";
-//		
-//		innerExecute(videoDirs, frameDirectory);
-		
-		String[] oldVideoDirs = { 
-				"H:\\Daniel\\Videos\\Base de dados - Movimentos Libras\\Base IC\\Daniel",
-				"H:\\Daniel\\Videos\\Base de dados - Movimentos Libras\\Base IC\\Roberta",
-				"H:\\Daniel\\Videos\\Base de dados - Movimentos Libras\\Base IC\\Sara",
-				"H:\\Daniel\\Videos\\Base de dados - Movimentos Libras\\Base IC\\Videos - Sara",
-				"H:\\Daniel\\Videos\\Base de dados - Movimentos Libras\\Base IC\\Videos - todos",
-				};
-		String[] oldFrameDirectory = {
-				"D:\\Daniel Documents\\Facul\\TCC\\Base de dados\\Base antiga\\Daniel",
-				"D:\\Daniel Documents\\Facul\\TCC\\Base de dados\\Base antiga\\Roberta",
-				"D:\\Daniel Documents\\Facul\\TCC\\Base de dados\\Base antiga\\Sara",
-				"D:\\Daniel Documents\\Facul\\TCC\\Base de dados\\Base antiga\\Videos - Sara",
-				"D:\\Daniel Documents\\Facul\\TCC\\Base de dados\\Base antiga\\Videos - todos",
+	{
+		String[] centroidFiles = {
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\IC\\Daniel.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\IC\\Roberta.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\IC\\Sara.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\IC\\Videos - Sara.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\IC\\Videos - todos.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\TCC\\Alex.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\TCC\\Daniel.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\TCC\\Lucas.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\TCC\\Márcia.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas)\\TCC\\Mirian.txt"
 		};
 		
-		innerExecute(oldVideoDirs, oldFrameDirectory);
+		String[] representationFiles = {
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\IC\\Daniel.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\IC\\Roberta.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\IC\\Sara.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\IC\\Videos - Sara.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\IC\\Videos - todos.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\TCC\\Alex.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\TCC\\Daniel.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\TCC\\Lucas.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\TCC\\Márcia.txt",
+			"H:\\TCC\\Base de dados (representação - coordenadas + velocidade instantânea)\\TCC\\Mirian.txt"
+		};
+		
+		DimensionBuilder[] representation = {
+			AbcissaCoordinateDimensionBuilder.getInstance(),
+			OrdinateCoordinateDimensionBuilder.getInstance(),
+			InstantVelocityDimensionBuilder.getInstance()
+		};
+		
+		LinkedList<RepresentationBuilderChainAction> list = new LinkedList<RepresentationBuilderChainAction>();
+		
+		generateActionsForRepresentation(centroidFiles, representationFiles, representation, list);
+		
+		list.getFirst().executeAction();
 	}
 
-	private void innerExecute(final String[] videoDirs,
-			final String[] frameDirs) {
-		for (int k = 0; k < videoDirs.length; k++) {
-			String videoDir = videoDirs[k];
-			String frameDirectory = frameDirs[k];
+	private void generateActionsForRepresentation(
+		String[] centroidFiles, String[] representationFiles, 
+		DimensionBuilder[] representation, LinkedList<RepresentationBuilderChainAction> list) {
+		
+		for (int i = 0; i < centroidFiles.length; i++) {
+			File centroidFile = new File(centroidFiles[i]);
+			File representationFile = new File(representationFiles[i]);
 			
-			ArrayList<File> videosToProcess = this.getVideos(videoDir, ".avi");
-			File[] frameDirectories = new File[videosToProcess.size()];
-			for (int i = 0; i < frameDirectories.length; i++) {
-				File videoToProcess = videosToProcess.get(i);
-
-				String videoName = videoToProcess.getName();
-				frameDirectories[i] = new File(frameDirectory + "\\"
-						+ videoName.substring(0, videoName.lastIndexOf('.')));
-
-				if (!frameDirectories[i].exists())
-					frameDirectories[i].mkdir();
-			}
-			LinkedList<VideoProcessChainAction> actions = new LinkedList<VideoProcessChainAction>();
-			for (int i = 0; i < videosToProcess.size(); i++) {
-				File videoToProcess = videosToProcess.get(i);
-				File frameDir = frameDirectories[i];
-
-				actions.add(new VideoProcessChainAction(videoToProcess,
-						frameDir));
-			}
-			for (int i = 1; i < actions.size(); i++)
-				actions.get(i - 1).setNextAction(actions.get(i));
-			actions.getFirst().executeAction();
+			if (!representationFile.getParentFile().exists())
+				representationFile.getParentFile().mkdirs();
+			
+			list.add(new RepresentationBuilderChainAction(centroidFile, representationFile, representation));
 		}
-	}
-	
-	private ArrayList<File> getVideos(String videoDir, String videoExtension)
-	{
-		ArrayList<File> videos = new ArrayList<File>();
 		
-		this.getVideos(videoDir, videoExtension, videos);
-		
-		return videos;
-	}
-
-	private void getVideos(String videoDir, String videoExtension, ArrayList<File> videos)
-	{
-		File directory = new File(videoDir);
-		
-		if (directory.exists())
-		{
-			String[] dirItems = directory.list();
-			
-			for (String item : dirItems)
-			{
-				File fileSystemEntry = new File(videoDir + "\\" + item);
-				
-				if (fileSystemEntry.isFile() && item.endsWith(videoExtension))					
-					videos.add(fileSystemEntry);
-				else if (fileSystemEntry.isDirectory())
-					this.getVideos(videoDir + "\\" + item, videoExtension, videos);
-			}
+		for (int i = 0; i < list.size() - 1; i++) {
+			list.get(i).setNextAction(list.get(i+1));
 		}
 	}
 }
