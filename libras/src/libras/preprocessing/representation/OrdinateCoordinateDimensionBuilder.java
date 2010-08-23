@@ -20,7 +20,7 @@ public class OrdinateCoordinateDimensionBuilder extends DimensionBuilder {
 		Double[] dimension = new Double[coordinates.length];
 		
 		for (int i = 0; i < dimension.length; i++) {
-			if (dimension[i] != null)
+			if (coordinates[i] != null)
 				dimension[i] = coordinates[i].getOrdinate();
 		}
 		

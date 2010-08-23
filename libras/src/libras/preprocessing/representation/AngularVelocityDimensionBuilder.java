@@ -17,17 +17,17 @@ public class AngularVelocityDimensionBuilder extends DimensionBuilder {
 	
 	@Override
 	public Double[] buildDimension(Coordinate[] coordinates) {
-		Double[] dimension = new Double[coordinates.length];
+		Double[] dimension = AbcissaAngleDimensionBuilder.getInstance().buildDimension(coordinates);
 		
 		if (dimension.length > 0) {
-
+			dimension[0] = 0.0;
+			
 			for (int i = 1; i < dimension.length; i++) {
 				if (dimension[i] != null && dimension[i-1] != null)
 					dimension[i] = dimension[i] - dimension[i-1];
 			}
-			
-			dimension[0] = 0.0;
 		}
+		
 		return dimension;
 	}
 }
