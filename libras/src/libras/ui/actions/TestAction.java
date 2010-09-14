@@ -29,9 +29,90 @@ public class TestAction extends Action
 		//normalizeRepresentationBySampling();
 		//normalizeRepresentationByDimension();
 		//normalizeRepresentationByData();
-		normalizeRepresentationByPosition();
+		//normalizeRepresentationByPosition();
+		concatFiles();
 	}
 
+	private void concatFiles() {
+		String[] dirs = {
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - ângulo abcissa)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - ângulo abcissa + ordenada)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas + ângulo abcissa)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas + ângulo abcissa + ordenada)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas + velocidade instantânea)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas + velocidade angular)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas + velocidade instantânea + angular)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - ângulo abcissa + velocidade angular)",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - ângulo abcissa + ordenada + velocidade angular)",
+			};
+		
+		String[] files = {
+				"\\IC\\Daniel.txt",
+				"\\IC\\Roberta.txt",
+				"\\IC\\Sara.txt",
+				"\\IC\\Videos - Sara.txt",
+				"\\IC\\Videos - todos.txt",
+				"\\TCC\\Alex.txt",
+				"\\TCC\\Daniel.txt",
+				"\\TCC\\Lucas.txt",
+				"\\TCC\\Márcia.txt",
+				"\\TCC\\Mirian.txt"
+			};
+		
+		String[] destinationFiles = {
+				"H:\\TCC\\Base de dados normalizada (por dado)\\coordenadas.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\angulo_abcissa.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\angulo_abcissa_ordenada.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\coordenadas_angulo_abcissa.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\coordenadas_angulo_abcissa_ordenada.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\coordenadas_velocidade_instantanea.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\coordenadas_velocidade_angular.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\coordenadas_velocidade_angular_instantanea.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\angulo_abcissa_velocidade_angular.data",
+				"H:\\TCC\\Base de dados normalizada (por dado)\\angulo_abcissa_ordenada_velocidade_angular.data",
+			};
+		
+		java.io.BufferedReader reader = null;
+		java.io.BufferedWriter writer = null;
+		
+		try
+		{
+			for (int i = 0; i < dirs.length; i++) {
+				String dir = dirs[i];
+				String destinationFile = destinationFiles[i];
+				
+				writer =
+					new java.io.BufferedWriter(
+						new java.io.FileWriter(destinationFile));
+				
+				for (String file : files) {
+					String inputFile = dir + file;
+
+					reader =
+						new java.io.BufferedReader(
+							new java.io.FileReader(inputFile));
+					
+					String line = null;
+					
+					while ((line = reader.readLine()) != null)
+					{
+						writer.write(line);
+						writer.newLine();
+					}
+					
+					if (reader != null) reader.close();
+				}
+				
+				if (writer != null) writer.close();
+			}
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace(System.err);
+		}
+	}
+	
 	private void generateActionsForNormalizationByPosition(
 			String[] representationDirs, String[] normalizationDirs, String[] files,
 			LinkedList<NormalizeRepresentationByPositionChainAction> list) {
