@@ -5,8 +5,14 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
 
+import libras.utils.ValidationHelper;
+
 public class KFoldCrossValidation<T> {
 	public KFoldCrossValidation(IEvaluationAlgorithm<T> evaluationAlgorithm, int K, int foldSize) {
+		ValidationHelper.validateIfParameterIsNull(evaluationAlgorithm, "evaluationAlgorithm");
+		ValidationHelper.validateIfParameterIsGreaterThanZero(K, "K");
+		ValidationHelper.validateIfParameterIsGreaterThanZero(foldSize, "foldSize");
+		
 		this.evaluationAlgorithm = evaluationAlgorithm;
 		this.K = K;
 		this.foldSize = foldSize;
@@ -19,17 +25,28 @@ public class KFoldCrossValidation<T> {
 	private int K = 0;
 	
 	public void doValidation(ArrayList<T[]> data, ArrayList<String> labels) {
+		ValidationHelper.validateIfParameterIsNull(data, "data");
+		ValidationHelper.validateIfParameterIsNull(labels, "labels");
+		ValidationHelper.validateIfArraysHaveSameLenght(data.size(), "data", labels.size(), "labels");
+		
 		if (data.size() < this.K * this.foldSize)
 			throw new InvalidParameterException(
 				String.format(
 					"The parameter \"data\" must have at least lenght equal to %d",
 					this.K * this.foldSize));
 		
-		if (data.size() != labels.size())
-			throw new InvalidParameterException("The data size must correspond to the labels size.");
+		if ((this.foldSize * this.K) % labels.size() != 0)
+			throw new InvalidParameterException("The foldSize times K must a multiple of label size.");
 		
-		if (this.foldSize % labels.size() != 0)
-			throw new InvalidParameterException("The foldSize must a multiple of label size.");
+		for (int i = 0; i < labels.size(); i++) {
+			if (labels.get(i) == null)
+				throw new InvalidParameterException("Null label found at index " + i);	
+		}
+		
+		for (int i = 0; i < data.size(); i++) {
+			if (data.get(i) == null)
+				throw new InvalidParameterException("Null data found at index " + i);	
+		}
 		
 		Hashtable<String, ArrayList<T[]>> dataDividedByLabels = this.divideDataByLabel(data, labels);
 		
@@ -51,14 +68,16 @@ public class KFoldCrossValidation<T> {
 		for (int i = 0; i < data.size(); i++) {
 			ArrayList<T[]> list = null;
 			
-			if (dataDividedByLabels.containsKey(labels.get(i)))
+			String label = labels.get(i);
+			
+			if (dataDividedByLabels.containsKey(label))
 			{
-				list = dataDividedByLabels.get(i);
+				list = dataDividedByLabels.get(label);
 			}
 			else
 			{
 				list = new ArrayList<T[]>();
-				dataDividedByLabels.put(labels.get(i), list);
+				dataDividedByLabels.put(label, list);
 			}
 					
 			list.add(data.get(i));
@@ -97,7 +116,7 @@ public class KFoldCrossValidation<T> {
 			for (String label : selectedData.keySet()) {
 				ArrayList<T[]> dataToChoose = selectedData.get(label);
 				
-				int maxLabelsPerFold = this.foldSize / selectedData.keySet().size();
+				int maxLabelsPerFold = this.K / selectedData.keySet().size();
 				
 				for (int j = 0; j < maxLabelsPerFold; j++) {
 					int indexToRemove = rnd.nextInt(dataToChoose.size()-1);
