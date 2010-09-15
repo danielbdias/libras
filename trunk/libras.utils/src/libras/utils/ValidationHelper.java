@@ -91,7 +91,7 @@ public final class ValidationHelper
 	}
 	
 	/** 
-	 * Verifies if a parameter equals or greater than 0 (zero), if false, throws an {@link InvalidParameterException}, 
+	 * Verifies if a parameter is equals or greater than 0 (zero), if false, throws an {@link InvalidParameterException}, 
 	 * otherwise do nothing.
 	 * @param parameter Parameter to be validated.
 	 * @param parameterName Parameter name.
@@ -101,5 +101,18 @@ public final class ValidationHelper
 		if (parameter < 0)
 			throw new InvalidParameterException(
 					String.format("The parameter \"%s\" cannot be less than zero.", parameterName));
+	}
+	
+	/** 
+	 * Verifies if a parameter is greater than 0 (zero), if false, throws an {@link InvalidParameterException}, 
+	 * otherwise do nothing.
+	 * @param parameter Parameter to be validated.
+	 * @param parameterName Parameter name.
+	 */
+	public static void validateIfParameterIsGreaterThanZero(long parameter, String parameterName)
+	{
+		if (parameter <= 0)
+			throw new InvalidParameterException(
+					String.format("The parameter \"%s\" cannot be less or equal to zero.", parameterName));
 	}
 }
