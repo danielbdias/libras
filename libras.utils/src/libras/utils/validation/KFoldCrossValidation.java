@@ -3,6 +3,7 @@ package libras.utils.validation;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 
 import libras.utils.ValidationHelper;
@@ -112,19 +113,24 @@ public class KFoldCrossValidation<T> {
 		
 		for (int i = 0; i < this.K; i++) {
 			ArrayList<T[]> foldData = new ArrayList<T[]>();
+			folds.add(new Fold<T>(foldData));
+		}
+		
+		for (String label : selectedData.keySet()) {
+			ArrayList<T[]> dataToChoose = selectedData.get(label);
 			
-			for (String label : selectedData.keySet()) {
-				ArrayList<T[]> dataToChoose = selectedData.get(label);
-				
-				int maxLabelsPerFold = this.K / selectedData.keySet().size();
+			int maxLabelsPerFold = this.foldSize / selectedData.keySet().size();
+			
+			for (int i = 0; i < this.K; i++) {
+				List<T[]> foldData = folds.get(i).getData();
 				
 				for (int j = 0; j < maxLabelsPerFold; j++) {
-					int indexToRemove = rnd.nextInt(dataToChoose.size()-1);
+					int indexToRemove = rnd.nextInt(dataToChoose.size());
+					if (indexToRemove > 0) indexToRemove--;
+					
 					foldData.add(dataToChoose.remove(indexToRemove));
-				}
+				}	
 			}
-			
-			folds.add(new Fold<T>(foldData));
 		}
 		
 		return folds;

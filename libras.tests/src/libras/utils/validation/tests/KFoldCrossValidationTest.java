@@ -149,9 +149,15 @@ public class KFoldCrossValidationTest {
 		
 		validator.doValidation(data, labels);
 		
+		int totalData = 0, failures = 0;
+		
 		for (TestData[] testData : data) {
-			assertTrue(testData[0].timesUsedInEvaluation == 1);
-			assertTrue(testData[0].timesUsedInTraining == (K-1));
+			totalData++;
+			
+			if (testData[0].timesUsedInEvaluation != 1 || testData[0].timesUsedInTraining != (K-1))
+				failures++;
 		}
+		
+		assertTrue(String.format("K-Fold Cross Validation failed. %d failures of %d tests.", failures, totalData), failures == 0);
 	}
 }
