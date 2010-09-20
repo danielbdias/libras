@@ -13,7 +13,7 @@ import libras.utils.*;
  * Create neural networks from xml data files. 
  * @author Daniel Baptista Dias
  */
-public class NetworkFileReader extends XmlFileParser
+public class NetworkFileReader
 {
 	private final static String ROOT_NODE = "network";
 	private final static String ITEM_NODE = "neuron";
@@ -150,12 +150,12 @@ public class NetworkFileReader extends XmlFileParser
 	 */
 	private double[][] parseRootNode(org.w3c.dom.Document document) throws Exception
 	{	
-		org.w3c.dom.Node batchFileNode = this.getNodeFromList(ROOT_NODE, document.getChildNodes());
+		org.w3c.dom.Node batchFileNode = XmlHelper.getNodeFromList(ROOT_NODE, document.getChildNodes());
 		
 		if (batchFileNode == null || !batchFileNode.getNodeName().equals(ROOT_NODE))
 			throw new Exception("The network file does not contain \"" + ROOT_NODE + "\" node.");
 		
-		List<org.w3c.dom.Node> neuronNodes = this.getChildNodes(batchFileNode);
+		List<org.w3c.dom.Node> neuronNodes = XmlHelper.getChildNodes(batchFileNode);
 		
 		if (neuronNodes == null || neuronNodes.isEmpty())
 			throw new Exception("The \"" + ROOT_NODE + "\" node does not contains any \"" + ITEM_NODE + "\" node as child.");
