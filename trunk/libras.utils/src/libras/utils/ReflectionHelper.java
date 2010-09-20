@@ -68,7 +68,9 @@ public final class ReflectionHelper
 					try
 					{
 						Class<?> subClass = Class.forName(pack.getName() + "." + className);
-						subClasses.add(subClass);
+						
+						if (!subClass.equals(clazz))
+							subClasses.add(subClass);
 					}
 					catch (ClassNotFoundException e) { }
 				}
