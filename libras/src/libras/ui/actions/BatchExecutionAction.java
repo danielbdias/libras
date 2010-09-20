@@ -5,7 +5,9 @@ package libras.ui.actions;
 
 import java.util.Hashtable;
 
-import libras.neuralnetworks.batches.*;
+import libras.batches.*;
+import libras.batches.taskfiles.TaskFileParser;
+import libras.batches.taskfiles.models.TaskFile;
 import libras.ui.actions.annotations.ActionDescription;
 
 /**
@@ -13,19 +15,19 @@ import libras.ui.actions.annotations.ActionDescription;
  * @author Daniel Baptista Dias
  */
 @ActionDescription(
-	command="batchfile",
-	commandExample="batchfile -file=[batchfile_path]",
-	helpDescription="Executes a batch training based in the batch file script.",
+	command="batchexec",
+	commandExample="batchexec -file=[taskfile_path]",
+	helpDescription="Executes a batch based in a task file script with various tasks.",
 	requiredArgs={ "file" },
 	needUserInput=true)
-public class BatchTrainingAction extends Action
+public class BatchExecutionAction extends Action
 {
 	/**
 	 * Creates a new instance of this action passing the batch file
 	 * with the configuration of the training
 	 * @param arguments Arguments of this action
 	 */
-	public BatchTrainingAction(Hashtable<String, String> arguments) 
+	public BatchExecutionAction(Hashtable<String, String> arguments) 
 	{
 		this(arguments.get("file"));
 	}
@@ -35,12 +37,12 @@ public class BatchTrainingAction extends Action
 	 * with the configuration of the training
 	 * @param batchFile Batch file with the training parameters
 	 */
-	public BatchTrainingAction(String batchFile) 
+	public BatchExecutionAction(String taskFile) 
 	{
-		this.batchFile = batchFile;
+		this.taskFile = taskFile;
 	}
 	
-	private String batchFile = null;
+	private String taskFile = null;
 	
 	/**
 	 * Executes the batch training.
@@ -48,29 +50,30 @@ public class BatchTrainingAction extends Action
 	 */
 	public void execute() throws Exception
 	{
-		System.out.printf("Executing batch: [%s] ...\r\n", batchFile);
+		System.out.printf("Executing batch: [%s] ...\r\n", taskFile);
 		
-		Batch batch = null;
+		TaskFile batch = null;
 		
 		try
 		{
-			BatchFileParser parser = new BatchFileParser();
-			batch = parser.parseBatchFile(batchFile);
+			TaskFileParser parser = new TaskFileParser();
+			batch = parser.parseFile(taskFile);
 		}
 		catch (Exception e)
 		{
-			throw new Exception("An unknown error occurs when recognizing batch file. See Cause for more details.", e);
+			throw new Exception(
+				"An unknown error occurs when recognizing batch file. See Cause for more details.", e);
 		}
 		
-		if (batch != null)
+		if (taskFile != null)
 		{
 			BatchProcessor processor = new BatchProcessor();
 			
-			BatchProcessResult[] results = processor.process(batch);
+			BatchTaskResult[] results = processor.process(batch);
 			
 			for (int i = 0; i < results.length; i++)
 			{
-				BatchProcessResult result = results[i];
+				BatchTaskResult result = results[i];
 				
 				System.out.printf("%d - Item [%s] completed ", i+1, result.getBatchItem());
 				
