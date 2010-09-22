@@ -78,6 +78,13 @@ public class XmlHelper
 			throw new Exception(validationMessage);
 	}
 	
+	public static void validateIfNodeHasContent(org.w3c.dom.Node node, String validationMessage) throws Exception {
+		String content = node.getTextContent();
+		
+		if (content == null || content.isEmpty())
+			throw new Exception(validationMessage);
+	}
+	
 	public static void validateIfNodeExists(org.w3c.dom.Node node, String nodeName, String validationMessage) throws Exception {
 		if (node == null || !node.getNodeName().equals(nodeName))
 			throw new Exception(validationMessage);

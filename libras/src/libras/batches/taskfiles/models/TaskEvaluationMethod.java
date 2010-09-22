@@ -1,5 +1,8 @@
 package libras.batches.taskfiles.models;
 
-public abstract class TaskEvaluationMethod {
+import libras.batches.evaluators.IEvaluationAlgorithm;
 
+public abstract class TaskEvaluationMethod {
+	
+	public abstract IEvaluationAlgorithm<Double> getEvaluationAlgorithm();
 }

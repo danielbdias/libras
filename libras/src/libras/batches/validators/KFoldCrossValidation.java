@@ -1,4 +1,4 @@
-package libras.utils.validation;
+package libras.batches.validators;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -6,9 +6,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
+import libras.batches.evaluators.IEvaluationAlgorithm;
 import libras.utils.ValidationHelper;
 
-public class KFoldCrossValidation<T> {
+public class KFoldCrossValidation<T> implements IValidationAlgorithm<T> {
 	public KFoldCrossValidation(IEvaluationAlgorithm<T> evaluationAlgorithm, int K, int foldSize) {
 		ValidationHelper.validateIfParameterIsNull(evaluationAlgorithm, "evaluationAlgorithm");
 		ValidationHelper.validateIfParameterIsGreaterThanZero(K, "K");
@@ -25,7 +26,10 @@ public class KFoldCrossValidation<T> {
 	
 	private int K = 0;
 	
-	public void doValidation(ArrayList<T[]> data, ArrayList<String> labels) {
+	/* (non-Javadoc)
+	 * @see libras.batches.validators.ValidationAlgorithm#doValidation(java.util.ArrayList, java.util.ArrayList)
+	 */
+	public void doValidation(ArrayList<T[]> data, ArrayList<String> labels) throws Exception {
 		ValidationHelper.validateIfParameterIsNull(data, "data");
 		ValidationHelper.validateIfParameterIsNull(labels, "labels");
 		ValidationHelper.validateIfArraysHaveSameLenght(data.size(), "data", labels.size(), "labels");
@@ -59,7 +63,15 @@ public class KFoldCrossValidation<T> {
 			ArrayList<Fold<T>> trainData = new ArrayList<Fold<T>>(folds);
 			
 			Fold<T> evaluationData = trainData.remove(i);
-			this.evaluationAlgorithm.evaluate(trainData, evaluationData);
+			
+			ArrayList<T[]> trainDataAsList = new ArrayList<T[]>(); 
+			ArrayList<String> trainDataLabelsAsList = new ArrayList<String>();
+			
+			this.convertTrainDataToList(trainData, trainDataAsList, trainDataLabelsAsList);
+			
+			this.evaluationAlgorithm.evaluate(
+				trainDataAsList, trainDataLabelsAsList, 
+				evaluationData.getData(), evaluationData.getLabels());
 		}
 	}
 
@@ -113,7 +125,8 @@ public class KFoldCrossValidation<T> {
 		
 		for (int i = 0; i < this.K; i++) {
 			ArrayList<T[]> foldData = new ArrayList<T[]>();
-			folds.add(new Fold<T>(foldData));
+			ArrayList<String> labels = new ArrayList<String>();
+			folds.add(new Fold<T>(foldData, labels));
 		}
 		
 		for (String label : selectedData.keySet()) {
@@ -123,12 +136,14 @@ public class KFoldCrossValidation<T> {
 			
 			for (int i = 0; i < this.K; i++) {
 				List<T[]> foldData = folds.get(i).getData();
+				List<String> labels = folds.get(i).getLabels();
 				
 				for (int j = 0; j < maxLabelsPerFold; j++) {
 					int indexToRemove = rnd.nextInt(dataToChoose.size());
 					if (indexToRemove > 0) indexToRemove--;
 					
 					foldData.add(dataToChoose.remove(indexToRemove));
+					labels.add(label);
 				}	
 			}
 		}
@@ -136,5 +151,10 @@ public class KFoldCrossValidation<T> {
 		return folds;
 	}
 
-	
+	private void convertTrainDataToList(ArrayList<Fold<T>> trainData, ArrayList<T[]> list, ArrayList<String> labels) {
+		for (Fold<T> fold : trainData) {
+			list.addAll(fold.getData());
+			labels.addAll(fold.getLabels());
+		}
+	}
 }
