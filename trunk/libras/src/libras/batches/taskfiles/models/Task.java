@@ -3,6 +3,9 @@
  */
 package libras.batches.taskfiles.models;
 
+import java.io.File;
+import java.util.List;
+
 /**
  * Represents a task in the batch file.
  * @author Daniel Baptista Dias
@@ -23,6 +26,36 @@ public class Task
 	
 	private TaskEvaluationMethod evaluationMethod = null;
 	
+	private List<File> inputFiles = null;
+	
+	private List<String> labels = null;
+	
+	private File outputReportFile = null;
+	
+	public List<File> getInputFiles() {
+		return inputFiles;
+	}
+	
+	public void setInputFiles(List<File> inputFiles) {
+		this.inputFiles = inputFiles;
+	}
+	
+	public File getOutputReportFile() {
+		return outputReportFile;
+	}
+	
+	public void setOutputReportFile(File outputReportFile) {
+		this.outputReportFile = outputReportFile;
+	}
+	
+	public List<String> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
+	}
+
 	public String getName() {
 		return name;
 	}

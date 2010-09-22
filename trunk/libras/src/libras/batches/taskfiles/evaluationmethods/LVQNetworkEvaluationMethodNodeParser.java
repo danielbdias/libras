@@ -21,55 +21,38 @@ public class LVQNetworkEvaluationMethodNodeParser extends TaskEvaluationMethodNo
 		
 		LVQNetworkEvaluationMethod evaluationMethod = new LVQNetworkEvaluationMethod();
 		
-		this.SetUpInputFilesForEvaluationMethod(evaluationMethod, node);
+		this.setUpNetworkSetupForEvaluationMethod(evaluationMethod, node);
 		
-		this.SetUpTrainingPhasesForEvaluationMethod(evaluationMethod, node);
-		
-		this.SetUpOutputFilesForEvaluationMethod(evaluationMethod, node);
+		this.setUpTrainingPhasesForEvaluationMethod(evaluationMethod, node);
 		
 		return evaluationMethod;
 	}
-
-	private void SetUpInputFilesForEvaluationMethod(LVQNetworkEvaluationMethod evaluationMethod, Node node) throws Exception {
-		final String INPUT_FILES_NODE_NAME = "inputFiles";
-		final String FILE_NODE_NAME = "file";
+	
+	private void setUpNetworkSetupForEvaluationMethod(LVQNetworkEvaluationMethod evaluationMethod, Node node) throws Exception {
+		final String NETWORK_SETUP_NODE_NAME = "networkSetup";
 		
-		Node inputFilesNode = XmlHelper.getNodeFromList(INPUT_FILES_NODE_NAME, node.getChildNodes());
+		Node networkSetupNode = XmlHelper.getNodeFromList(NETWORK_SETUP_NODE_NAME, node.getChildNodes());
 		
-		XmlHelper.validateIfNodeExists(inputFilesNode, INPUT_FILES_NODE_NAME, 
-			String.format("The \"%s\" node of the %s must exists and cannot be empty.", INPUT_FILES_NODE_NAME, NODE_NAME));
+		XmlHelper.validateIfNodeExists(networkSetupNode, NETWORK_SETUP_NODE_NAME, 
+			String.format("The \"%s\" node of the %s must exists and cannot be empty.", NETWORK_SETUP_NODE_NAME, NODE_NAME));
 		
-		XmlHelper.validateIfNodeHasChildren(inputFilesNode, 
-			String.format("The \"%s\" node of the %s must have at least one child.", 
-					INPUT_FILES_NODE_NAME, NODE_NAME));
+		XmlHelper.validateIfAttributeExists(networkSetupNode, "fromFile", 
+				String.format("The \"%s\" node of the %s must have an attribute named \"%s\".",
+						NETWORK_SETUP_NODE_NAME, NODE_NAME, "fromFile"));
 		
-		List<Node> children = XmlHelper.getChildNodes(inputFilesNode);
+		String networkSetupFile = XmlHelper.getAttributeValueFromNode("fromFile", networkSetupNode);
 		
-		if (children != null && children.size() > 0) {
-			Node childNode = children.get(0);
+		File file = new File(networkSetupFile);
 		
-			XmlHelper.validateIfNodeExists(childNode, FILE_NODE_NAME,
-				String.format("The \"%s\" node of the %s must have only childs nodes with name \"%s\".",
-					INPUT_FILES_NODE_NAME, NODE_NAME, FILE_NODE_NAME));
-			
-			XmlHelper.validateIfAttributeExists(childNode, "name", 
-				String.format("The \"%s\" of \"%s\" node of the %s must have an attribute named \"%s\".",
-					FILE_NODE_NAME, INPUT_FILES_NODE_NAME, NODE_NAME, "name"));
-			
-			String fileName = XmlHelper.getAttributeValueFromNode("name", childNode);
-			
-			File file = new File(fileName);
-			
-			if (!file.exists())
-				throw new Exception(
-					String.format("The \"%s\" of \"%s\" node of the %s must have a valid file.",
-						FILE_NODE_NAME, INPUT_FILES_NODE_NAME, NODE_NAME));
-			
-			evaluationMethod.setInputFile(file);
-		}
+		if (!file.exists())
+			throw new Exception(
+				String.format("The \"%s\" node of the %s must have a valid file.",
+						NETWORK_SETUP_NODE_NAME, NODE_NAME));
+		
+		evaluationMethod.setNetworkSetupFile(file);
 	}
 
-	private void SetUpTrainingPhasesForEvaluationMethod(LVQNetworkEvaluationMethod evaluationMethod, Node node) throws Exception {
+	private void setUpTrainingPhasesForEvaluationMethod(LVQNetworkEvaluationMethod evaluationMethod, Node node) throws Exception {
 		final String TRAINING_PHASES_NODE_NAME = "networkTraining";
 		final String TRAINING_NODE_NAME = "training";
 		
@@ -136,48 +119,6 @@ public class LVQNetworkEvaluationMethodNodeParser extends TaskEvaluationMethodNo
 			}
 			
 			evaluationMethod.setTrainingPhases(trainingPhases);
-		}
-	}
-
-	private void SetUpOutputFilesForEvaluationMethod(LVQNetworkEvaluationMethod evaluationMethod, Node node) throws Exception {
-		final String OUTPUT_FILES_NODE_NAME = "outputFiles";
-		
-		Node outputFilesNode = XmlHelper.getNodeFromList(OUTPUT_FILES_NODE_NAME, node.getChildNodes());
-		
-		XmlHelper.validateIfNodeExists(outputFilesNode, OUTPUT_FILES_NODE_NAME, 
-			String.format("The \"%s\" node of the %s must exists and cannot be empty.", OUTPUT_FILES_NODE_NAME, NODE_NAME));
-		
-		XmlHelper.validateIfNodeHasChildren(outputFilesNode, 
-			String.format("The \"%s\" node of the %s must have at least one child.", 
-					OUTPUT_FILES_NODE_NAME, NODE_NAME));
-			
-		List<Node> children = XmlHelper.getChildNodes(outputFilesNode);
-		
-		if (children != null && children.size() > 0) {
-			for (Node childNode : children) {
-				if (childNode.getNodeName().equals("dataFile")) {
-					XmlHelper.validateIfAttributeExists(childNode, "name", 
-						String.format("The \"%s\" of \"%s\" node of the %s must have an attribute named \"%s\".",
-							"dataFile", OUTPUT_FILES_NODE_NAME, NODE_NAME, "name"));
-						
-					String fileName = XmlHelper.getAttributeValueFromNode("name", childNode);
-					
-					File file = new File(fileName);
-					
-					evaluationMethod.setOutputResultFile(file);
-				}
-				else if (childNode.getNodeName().equals("networkFile")) {
-					XmlHelper.validateIfAttributeExists(childNode, "name", 
-						String.format("The \"%s\" of \"%s\" node of the %s must have an attribute named \"%s\".",
-							"dataFile", OUTPUT_FILES_NODE_NAME, NODE_NAME, "name"));
-							
-					String fileName = XmlHelper.getAttributeValueFromNode("name", childNode);
-					
-					File file = new File(fileName);
-					
-					evaluationMethod.setOutputNetworkFile(file);
-				}
-			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package libras.utils.validation.tests;
+package libras.batches.validators.tests;
 
 import static org.junit.Assert.*;
 
@@ -6,9 +6,9 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-import libras.utils.validation.Fold;
-import libras.utils.validation.IEvaluationAlgorithm;
-import libras.utils.validation.KFoldCrossValidation;
+import libras.batches.evaluators.IEvaluationAlgorithm;
+import libras.batches.validators.KFoldCrossValidation;
+import libras.batches.validators.IValidationAlgorithm;
 
 import org.junit.Test;
 
@@ -17,14 +17,28 @@ public class KFoldCrossValidationTest {
 	class TestData {
 		public int timesUsedInTraining = 0;
 		public int timesUsedInEvaluation = 0;
+		public String label = null;
 	}
 	
 	@Test
 	public void testKFoldCrossValidationContructor() {
 		IEvaluationAlgorithm<Object> eval = new IEvaluationAlgorithm<Object>() {
 			@Override
-			public void evaluate(List<Fold<Object>> trainData,
-					Fold<Object> evaluationData) {
+			public List<String> getExpectedLabels() {
+				// this is a stub, do nothing
+				return null;
+			}
+			
+			@Override
+			public List<String> getComputedLabels() {
+				// this is a stub, do nothing
+				return null;
+			}
+			
+			@Override
+			public void evaluate(List<Object[]> trainData,
+					List<String> trainDataLabels, List<Object[]> evaluationData,
+					List<String> evaluationDataLabels) {
 				// this is a stub, do nothing
 			}
 		};
@@ -52,17 +66,28 @@ public class KFoldCrossValidationTest {
 	public void testDoValidation() {
 		IEvaluationAlgorithm<TestData> evaluationAlgorithm = new IEvaluationAlgorithm<TestData>() {
 			@Override
-			public void evaluate(List<Fold<TestData>> trainData,
-					Fold<TestData> evaluationData) {
-				for (Fold<TestData> fold : trainData) {
-					for (TestData[] data : fold.getData()) {
-						for (TestData dataItem : data) {
-							dataItem.timesUsedInTraining++;
-						}
+			public List<String> getExpectedLabels() {
+				// this is a stub, do nothing
+				return null;
+			}
+			
+			@Override
+			public List<String> getComputedLabels() {
+				// this is a stub, do nothing
+				return null;
+			}
+			
+			@Override
+			public void evaluate(List<TestData[]> trainData,
+					List<String> trainDataLabels, List<TestData[]> evaluationData,
+					List<String> evaluationDataLabels) {
+				for (TestData[] data : trainData) {
+					for (TestData dataItem : data) {
+						dataItem.timesUsedInTraining++;
 					}
 				}
 				
-				for (TestData[] data : evaluationData.getData()) {
+				for (TestData[] data : evaluationData) {
 					for (TestData dataItem : data) {
 						dataItem.timesUsedInEvaluation++;
 					}
@@ -73,7 +98,7 @@ public class KFoldCrossValidationTest {
 		final int K = 10;
 		final int foldSize = 30;
 		
-		KFoldCrossValidation<TestData> validator = 
+		IValidationAlgorithm<TestData> validator = 
 			new KFoldCrossValidation<TestData>(evaluationAlgorithm, K, foldSize);
 		
 		try {
@@ -143,8 +168,12 @@ public class KFoldCrossValidationTest {
 		ArrayList<String> labels = new ArrayList<String>();
 		
 		for (int i = 0; i < (K*foldSize); i++) {
-			data.add(new TestData[] { new TestData() });
-			labels.add(Integer.toString(i/foldSize));
+			String label = Integer.toString(i/foldSize);
+			TestData testdata = new TestData();
+			testdata.label = label;
+			
+			data.add(new TestData[] { testdata });
+			labels.add(label);
 		}
 		
 		validator.doValidation(data, labels);

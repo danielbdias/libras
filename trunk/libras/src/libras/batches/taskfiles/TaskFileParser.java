@@ -3,10 +3,12 @@
  */
 package libras.batches.taskfiles;
 
+import java.io.File;
 import java.util.*;
 
+import org.w3c.dom.Node;
+
 import libras.batches.taskfiles.annotations.*;
-import libras.batches.taskfiles.annotations.ValidationMethod;
 import libras.batches.taskfiles.evaluationmethods.*;
 import libras.batches.taskfiles.models.*;
 import libras.batches.taskfiles.validationmethods.*;
@@ -96,9 +98,13 @@ public class TaskFileParser
 		
 		this.getNameForItem(itemNode, task, order);
 		
+		this.getInputDataForItem(itemNode, task, order);
+		
 		this.getValidationMethodForItem(itemNode, task, order);
 		
 		this.getEvaluationMethodForItem(itemNode, task, order);
+		
+		this.getOutputDataForItem(itemNode, task, order);
 		
 		return task;
 	}
@@ -124,6 +130,103 @@ public class TaskFileParser
 		task.setName(name);
 	}
 
+	private void getInputDataForItem(org.w3c.dom.Node itemNode, Task task, int order) throws Exception {
+		final String INPUT_DATA_NODE_NAME = "inputData";
+		final String FILE_NODE_NAME = "file";
+		final String LABEL_NODE = "labels";
+		
+		Node inputDataNode = XmlHelper.getNodeFromList(INPUT_DATA_NODE_NAME, itemNode.getChildNodes());
+		
+		XmlHelper.validateIfNodeExists(inputDataNode, INPUT_DATA_NODE_NAME, 
+			String.format(
+				"The %d st \"%s\" node must have a \"%s\" child node.", 
+				order, ITEM_NODE, INPUT_DATA_NODE_NAME));
+		
+		XmlHelper.validateIfNodeHasChildren(inputDataNode, 
+			String.format(
+				"The %d st \"%s\" node must have a \"%s\" child node with at least one validation method.",
+				order, ITEM_NODE, INPUT_DATA_NODE_NAME));
+		
+		List<Node> children = XmlHelper.getChildNodes(inputDataNode);
+		
+		if (children != null && children.size() > 0) {
+			List<File> inputFiles = new ArrayList<File>();
+			
+			for (Node childNode : children) {
+				if (childNode.getNodeName().equals(FILE_NODE_NAME)) {	
+					XmlHelper.validateIfAttributeExists(childNode, "name", 
+						String.format("The \"%s\" of \"%s\" node of the %s must have an attribute named \"%s\".",
+							FILE_NODE_NAME, INPUT_DATA_NODE_NAME, ITEM_NODE, "name"));
+					
+					String fileName = XmlHelper.getAttributeValueFromNode("name", childNode);
+					
+					File file = new File(fileName);
+					
+					if (!file.exists())
+						throw new Exception(
+							String.format("The \"%s\" of \"%s\" node of the %s must have a valid file.",
+								FILE_NODE_NAME, INPUT_DATA_NODE_NAME, ITEM_NODE));
+					
+					inputFiles.add(file);
+				}
+				else if (childNode.getNodeName().equals(LABEL_NODE)) {
+					XmlHelper.validateIfNodeHasContent(childNode, 
+						String.format(
+							String.format("The \"%s\" of \"%s\" node of the %s must have some text content.",
+								LABEL_NODE, INPUT_DATA_NODE_NAME, ITEM_NODE)));
+					
+					List<String> labels = new ArrayList<String>();
+					
+					String data = childNode.getTextContent();
+				
+					String[] parsedData = data.split(",");
+
+					for (String label : parsedData) {
+						labels.add(label);
+					}
+					
+					task.setLabels(labels);
+				}
+			}
+			
+			task.setInputFiles(inputFiles);
+		}
+	}
+	
+	private void getOutputDataForItem(org.w3c.dom.Node itemNode, Task task, int order) throws Exception {
+		final String OUTPUT_DATA_NODE_NAME = "outputData";
+		
+		Node outputDataNode = XmlHelper.getNodeFromList(OUTPUT_DATA_NODE_NAME, itemNode.getChildNodes());
+		
+		XmlHelper.validateIfNodeExists(outputDataNode, OUTPUT_DATA_NODE_NAME, 
+				String.format(
+					"The %d st \"%s\" node must have a \"%s\" child node.", 
+					order, ITEM_NODE, OUTPUT_DATA_NODE_NAME));
+			
+			XmlHelper.validateIfNodeHasChildren(outputDataNode, 
+				String.format(
+					"The %d st \"%s\" node must have a \"%s\" child node with at least one validation method.",
+					order, ITEM_NODE, OUTPUT_DATA_NODE_NAME));
+			
+		List<Node> children = XmlHelper.getChildNodes(outputDataNode);
+		
+		if (children != null && children.size() > 0) {
+			for (Node childNode : children) {
+				if (childNode.getNodeName().equals("reportFile")) {
+					XmlHelper.validateIfAttributeExists(childNode, "name", 
+						String.format("The \"%s\" of \"%s\" node of the %s must have an attribute named \"%s\".",
+							"dataFile", OUTPUT_DATA_NODE_NAME, ITEM_NODE, "name"));
+						
+					String fileName = XmlHelper.getAttributeValueFromNode("name", childNode);
+					
+					File file = new File(fileName);
+					
+					task.setOutputReportFile(file);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Get the validation method of the task node.
 	 * @param itemNode Node to be parsed.
