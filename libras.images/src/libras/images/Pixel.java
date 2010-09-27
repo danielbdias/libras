@@ -90,7 +90,18 @@ public class Pixel
 				String.format("Invalid pixel. The pixel dimension must be equal or greater than %d.", 
 						PIXEL_COLORS));
 		
-		this.pixel = getSingleIntRepresentation(colors[RED_INDEX], colors[GREEN_INDEX], colors[BLUE_INDEX]);
+		this.pixel = getIntegerRepresentationFromTwentyFourBitRepresentation(colors[RED_INDEX], colors[GREEN_INDEX], colors[BLUE_INDEX]);
+	}
+	
+	/**
+	 * Instantiate a new pixel with determined values in a array.
+	 * This constructor must me used only in the PixelFactory class. 
+	 * To get an instance uses the {@link libras.images.PixelFactory} instead.
+	 * @param colors Array with the 3 color components (Red, Green, Blue) of the pixel
+	 */
+	Pixel(int representation)
+	{	
+		this.pixel = representation;
 	}
 	
 	/**
@@ -141,7 +152,36 @@ public class Pixel
 		return this.pixel;
 	}
 
-	static int getSingleIntRepresentation(int red, int green, int blue)
+	/**
+	 * Get the color 24-bit representation.
+	 */
+	static int getIntegerRepresentationFromEightBitRepresentation(int[] colors)
+	{	
+		return getIntegerRepresentationFromTwentyFourBitRepresentation(colors);
+	}
+	
+	/**
+	 * Get the color 24-bit representation.
+	 */
+	static int getIntegerRepresentationFromEightBitGrayscaleRepresentation(int[] colors)
+	{
+		int eightBitRepresentation = colors[0];
+		
+		return getIntegerRepresentationFromTwentyFourBitRepresentation(eightBitRepresentation, eightBitRepresentation, eightBitRepresentation);
+	}
+	
+	/**
+	 * Get the color 24-bit representation.
+	 */
+	static int getIntegerRepresentationFromTwentyFourBitRepresentation(int[] colors)
+	{
+		return getIntegerRepresentationFromTwentyFourBitRepresentation(colors[Pixel.RED_INDEX], colors[Pixel.GREEN_INDEX], colors[Pixel.BLUE_INDEX]);
+	}
+	
+	/**
+	 * Get the color 24-bit representation.
+	 */
+	static int getIntegerRepresentationFromTwentyFourBitRepresentation(int red, int green, int blue)
 	{
 		return (red << 16) | (green << 8) | (blue << 0);
 	}

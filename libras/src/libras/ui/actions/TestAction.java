@@ -30,10 +30,17 @@ public class TestAction extends Action
 		//normalizeRepresentationByDimension();
 		//normalizeRepresentationByData();
 		//normalizeRepresentationByPosition();
-		concatFiles();
+		//concatFiles();
+		
+		libras.images.Image image = libras.images.utils.ImageHelper.getImage(
+			new File("D:\\Daniel Documents\\frame0000.jpg"));
+		
+		File f = new File("D:\\Daniel Documents\\teste.jpg");
+		
+		libras.images.utils.ImageHelper.buildImage(image, f);
 	}
 
-	private void concatFiles() {
+	protected void concatFiles() {
 		String[] dirs = {
 				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas)",
 				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - ângulo abcissa)",
