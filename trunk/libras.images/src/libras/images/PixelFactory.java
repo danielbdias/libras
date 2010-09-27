@@ -40,21 +40,37 @@ public class PixelFactory
 	 */
 	public static Pixel getPixel(int[] colors) 
 	{
+		return getPixel(colors, PixelColorDepth.TwentyFourBits);
+	}
+	
+	/**
+	 * Gets a pixel with the specified parameter values.
+	 * @param colors Array with the components of the pixel.
+	 * @return Pixel with the specified parameter values.
+	 */
+	public static Pixel getPixel(int[] colors, PixelColorDepth colorDepth) 
+	{
 		ValidationHelper.validateIfParameterIsNull(colors, "colors");
 		
-		if (colors.length < Pixel.PIXEL_COLORS)
+		if (colors.length < colorDepth.numberOfBits())
 			throw new InvalidParameterException(
 				String.format("Invalid pixel. The pixel dimension must be equal or greater than %d.", 
-						Pixel.PIXEL_COLORS));
+						colorDepth.numberOfBits()));
 		
-		Integer sigleIntRepresentation = 
-			Integer.valueOf(Pixel.getSingleIntRepresentation(colors[Pixel.RED_INDEX], colors[Pixel.GREEN_INDEX], colors[Pixel.BLUE_INDEX]));
+		Integer sigleIntRepresentation = null;
+		
+		if (colorDepth == PixelColorDepth.TwentyFourBits)
+			sigleIntRepresentation = Integer.valueOf(Pixel.getIntegerRepresentationFromTwentyFourBitRepresentation(colors));
+		else if (colorDepth == PixelColorDepth.EightBits)
+			sigleIntRepresentation = Integer.valueOf(Pixel.getIntegerRepresentationFromEightBitRepresentation(colors));
+		else if (colorDepth == PixelColorDepth.EightBitsGrayscale)
+			sigleIntRepresentation = Integer.valueOf(Pixel.getIntegerRepresentationFromEightBitGrayscaleRepresentation(colors));
 		
 		Pixel pix = cache.get(sigleIntRepresentation);
 		
 		if (pix == null)
 		{
-			pix = new Pixel(colors[Pixel.RED_INDEX], colors[Pixel.GREEN_INDEX], colors[Pixel.BLUE_INDEX]);
+			pix = new Pixel(sigleIntRepresentation);
 			cache.put(sigleIntRepresentation, pix);
 		}
 		

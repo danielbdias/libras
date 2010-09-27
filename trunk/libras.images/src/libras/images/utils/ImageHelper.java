@@ -36,6 +36,9 @@ public final class ImageHelper
 		
 		Raster raster = renderedOp.getData();
 		
+		PixelColorDepth colorDepth = PixelColorDepth.getColorDepth(		
+				raster.getSampleModel().getDataType(), raster.getSampleModel().getNumBands());
+		
 		Image image = new Image(raster.getWidth(), raster.getHeight());
 		
 		for (int i = 0; i < image.getWidth(); i++) 
@@ -44,8 +47,7 @@ public final class ImageHelper
 			{
 				int[] pixelData = raster.getPixel(i, j, (int[]) null);
 				
-				if (pixelData.length >= Pixel.PIXEL_COLORS)
-					image.setPixel(i, j, PixelFactory.getPixel(pixelData));
+				image.setPixel(i, j, PixelFactory.getPixel(pixelData, colorDepth));
 			}
 		}
 		
