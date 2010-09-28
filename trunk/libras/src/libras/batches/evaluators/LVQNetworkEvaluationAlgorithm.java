@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import libras.batches.taskfiles.evaluationmethods.models.LVQNetworkEvaluationMethod;
-import libras.batches.taskfiles.evaluationmethods.models.TrainingPhaseDescription;
+import libras.batches.taskfiles.evaluationmethods.models.LVQTrainingPhaseDescription;
 import libras.neuralnetworks.distancenetworks.DistanceNeuralNetwork;
 import libras.neuralnetworks.functions.LinearFunction;
 import libras.neuralnetworks.learning.LVQLearningStrategy;
@@ -88,7 +88,7 @@ public class LVQNetworkEvaluationAlgorithm implements IEvaluationAlgorithm<Doubl
 		
 		this.prepareData(input, trainingData, expectedOutput, trainingDataLabels);
 		
-		for (TrainingPhaseDescription trainingPhase : this.evaluationModel.getTrainingPhases()) {
+		for (LVQTrainingPhaseDescription trainingPhase : this.evaluationModel.getTrainingPhases()) {
 			LearningVectorQuantization teacher =
 				new LearningVectorQuantization(
 						network, 

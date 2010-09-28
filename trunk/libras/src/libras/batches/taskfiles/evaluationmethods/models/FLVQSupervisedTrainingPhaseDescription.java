@@ -1,9 +1,9 @@
 package libras.batches.taskfiles.evaluationmethods.models;
 
-public class TrainingPhaseDescription {
+public class FLVQSupervisedTrainingPhaseDescription {
 	private int epochs;
 	private double learningRate;
-	private double learningDecreasingRate;
+	private double fuzzyficationParameter;
 	
 	public int getEpochs() {
 		return epochs;
@@ -17,10 +17,10 @@ public class TrainingPhaseDescription {
 	public void setLearningRate(double learningRate) {
 		this.learningRate = learningRate;
 	}
-	public double getLearningDecreasingRate() {
-		return learningDecreasingRate;
+	public double getFuzzyficationParameter() {
+		return fuzzyficationParameter;
 	}
-	public void setLearningDecreasingRate(double learningDecreasingRate) {
-		this.learningDecreasingRate = learningDecreasingRate;
+	public void setFuzzyficationParameter(double fuzzyficationParameter) {
+		this.fuzzyficationParameter = fuzzyficationParameter;
 	}
 }
