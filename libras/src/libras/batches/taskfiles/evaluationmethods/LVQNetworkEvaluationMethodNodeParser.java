@@ -69,7 +69,7 @@ public class LVQNetworkEvaluationMethodNodeParser extends TaskEvaluationMethodNo
 		
 		if (children != null && children.size() > 0) {
 							
-			List<TrainingPhaseDescription> trainingPhases = new ArrayList<TrainingPhaseDescription>();
+			List<LVQTrainingPhaseDescription> trainingPhases = new ArrayList<LVQTrainingPhaseDescription>();
 			
 			for (Node childNode : children) {
 				XmlHelper.validateIfNodeExists(childNode, TRAINING_NODE_NAME,
@@ -109,7 +109,7 @@ public class LVQNetworkEvaluationMethodNodeParser extends TaskEvaluationMethodNo
 						String.format("The \"%s\" of \"%s\" node in the %s must be a number.", 
 						"learningDecreasingRate", TRAINING_NODE_NAME, TRAINING_PHASES_NODE_NAME));
 				
-				TrainingPhaseDescription description = new TrainingPhaseDescription();
+				LVQTrainingPhaseDescription description = new LVQTrainingPhaseDescription();
 				
 				description.setEpochs(Integer.parseInt(epochsAsString));
 				description.setLearningRate(Double.parseDouble(learningRateAsString));

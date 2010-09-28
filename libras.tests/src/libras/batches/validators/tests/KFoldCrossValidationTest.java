@@ -104,12 +104,12 @@ public class KFoldCrossValidationTest {
 		try {
 			validator.doValidation(null, null);
 			fail("Accepted null data.");
-		} catch (InvalidParameterException e) { }
+		} catch (Exception e) { }
 		
 		try {
 			validator.doValidation(new ArrayList<TestData[]>(), null);
 			fail("Accepted null labels.");
-		} catch (InvalidParameterException e) { }
+		} catch (Exception e) { }
 		
 		try {
 			ArrayList<TestData[]> data = new ArrayList<TestData[]>();
@@ -122,7 +122,7 @@ public class KFoldCrossValidationTest {
 			
 			validator.doValidation(data, labels);
 			fail("Accepted data size greater than labels size.");
-		} catch (InvalidParameterException e) { }
+		} catch (Exception e) { }
 		
 		try {
 			ArrayList<TestData[]> data = new ArrayList<TestData[]>();
@@ -135,7 +135,7 @@ public class KFoldCrossValidationTest {
 			
 			validator.doValidation(data, labels);
 			fail("Accepted data size lesser than labels size.");
-		} catch (InvalidParameterException e) { }
+		} catch (Exception e) { }
 		
 		try {
 			ArrayList<TestData[]> data = new ArrayList<TestData[]>();
@@ -149,7 +149,7 @@ public class KFoldCrossValidationTest {
 			
 			validator.doValidation(data, labels);
 			fail("Accepted data size lesser than K times FoldSize.");
-		} catch (InvalidParameterException e) { }
+		} catch (Exception e) { }
 		
 		try {
 			ArrayList<TestData[]> data = new ArrayList<TestData[]>();
@@ -162,7 +162,7 @@ public class KFoldCrossValidationTest {
 			
 			validator.doValidation(data, labels);
 			fail("Accepted data size greater than K times FoldSize.");
-		} catch (InvalidParameterException e) { }
+		} catch (Exception e) { }
 		
 		ArrayList<TestData[]> data = new ArrayList<TestData[]>();
 		ArrayList<String> labels = new ArrayList<String>();
@@ -176,7 +176,11 @@ public class KFoldCrossValidationTest {
 			labels.add(label);
 		}
 		
-		validator.doValidation(data, labels);
+		try {
+			validator.doValidation(data, labels);
+		} catch (Exception e) {
+			throw new AssertionError(e);
+		}
 		
 		int totalData = 0, failures = 0;
 		
