@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<batch>
+	<task name="Instance01_SOM_Test01">
+		<inputData>
+			<labels>1,2,3</labels>
+			<file name="D:\Daniel Documents\Facul\TCC\Batchs\inputData.txt" />
+		</inputData>
+		<validationMethod>
+			<kFoldCrossValidation K="3" foldSize="5" />
+		</validationMethod>
+		<evaluationMethod>
+			<lvqNetwork>
+				<networkSetup fromFile="D:\Daniel Documents\Facul\TCC\Batchs\networkSetup.txt" />
+				<networkTraining>
+					<training epochs="50" learningRate="0.5" learningDecreasingRate="0.9" />
+					<training epochs="150" learningRate="0.1" learningDecreasingRate="0.01" />
+				</networkTraining>
+			</lvqNetwork>
+		</evaluationMethod>
+		<outputData>
+			<reportFile name="D:\Daniel Documents\Facul\TCC\Batchs\output.xml" />
+		</outputData>
+	</task>
+</batch>

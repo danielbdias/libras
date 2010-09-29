@@ -164,7 +164,7 @@ public class FLVQCommitteeEvaluationMethodNodeParser extends
 		
 		String numberOfClustersAsString = XmlHelper.getAttributeValueFromNode("numberOfClusters", unsupervisedTrainingPhase);
 		
-		if (!numberOfClustersAsString.matches("[0-9]+\\.[0-9]+"))
+		if (!numberOfClustersAsString.matches("^[0-9]+$"))
 			throw new Exception(
 				String.format("The \"%s\" of \"%s\" node in the %s must be a number.", 
 				"numberOfClusters", TRAINING_NODE_NAME, TRAINING_PHASES_NODE_NAME));
