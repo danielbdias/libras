@@ -1,0 +1,42 @@
+<reportFile>
+	<batchName>Instance01_SOM_Test01</batchName>
+	<hitTax>1,000000</hitTax>
+	<tests size="9">
+		<test>
+			<expectedLabel>3</expectedLabel>
+			<computedLabel>3</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>2</expectedLabel>
+			<computedLabel>2</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>1</expectedLabel>
+			<computedLabel>1</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>3</expectedLabel>
+			<computedLabel>3</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>2</expectedLabel>
+			<computedLabel>2</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>1</expectedLabel>
+			<computedLabel>1</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>3</expectedLabel>
+			<computedLabel>3</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>2</expectedLabel>
+			<computedLabel>2</computedLabel>
+		</test>
+		<test>
+			<expectedLabel>1</expectedLabel>
+			<computedLabel>1</computedLabel>
+		</test>
+	</tests>
+</reportFile>
