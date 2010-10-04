@@ -136,6 +136,10 @@ public class LVQ {
 		porEpoca = true;
 	}
 	
+	public LVQ(double aprendizagemInicial) throws IOException{
+		this(null, aprendizagemInicial);
+	}
+	
 	public LVQ(String nomeArquivo, double aprendizagemInicial) throws IOException{
 		this.nomeArquivo = nomeArquivo.replace(".", "-flvq.");
 		dados = new Vetor(nomeArquivo, true);
@@ -215,7 +219,7 @@ public class LVQ {
 					atualizaPeso(atual, neuronioEscolhido);					
 				}
 				//reduzAprendizado(coeficiente);
-				if(epoca == 8) pesos.salvaArquivo(nomeArquivo + "_8", true);
+//				if(epoca == 8) pesos.salvaArquivo(nomeArquivo + "_8", true);
 				epoca++;
 			}while(epoca < epocas && mudancaInsatisfatoria());
 			System.out.println("Epocas = " + epoca);
@@ -232,7 +236,7 @@ public class LVQ {
 			}while(aprendizagem > aprendizagemFinal);
 		}
 		
-		pesos.salvaArquivo(nomeArquivo, true);
+//		pesos.salvaArquivo(nomeArquivo, true);
 	}
 	
 	public String[] testa(){

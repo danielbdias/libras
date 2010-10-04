@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/libras.neuralnetworks"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/libras.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/libras.videos"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FLVQS"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
