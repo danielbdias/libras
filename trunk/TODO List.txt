@@ -20,5 +20,5 @@ Medidores de clusterização
   - DB-Index (+ K-Means)
   
 Representações
-  - Transformada de Fourier
+  + Transformada de Fourier
   - Momentos de Hu

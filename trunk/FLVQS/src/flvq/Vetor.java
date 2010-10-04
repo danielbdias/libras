@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class Vetor implements Iterable<Dado>{
@@ -29,6 +30,23 @@ public class Vetor implements Iterable<Dado>{
 	public Vetor(String nomeArquivo, boolean supervisionada) throws IOException{
 		v = new ArrayList<Dado>();
 		carregaArquivo(nomeArquivo, supervisionada);
+	}
+	
+	public Vetor(List<Double[]> dadosIniciais, List<String> classes, boolean supervisionada) throws IOException{
+		v = new ArrayList<Dado>();
+		
+		for (int i = 0; i < dadosIniciais.size(); i++) {
+			Double[] dadoInicial = dadosIniciais.get(i);
+			
+			ArrayList<Double> dadoInicialComoList = new ArrayList<Double>();
+			
+			for (int j = 0; j < dadoInicial.length; j++)
+				dadoInicialComoList.add(dadoInicial[j]);
+
+			String classe = classes.get(i);
+			
+			v.add(new Dado(dadoInicialComoList, classe));
+		}
 	}
 	
 	public Vetor(int tamanho, int dimensao, double min, double max){

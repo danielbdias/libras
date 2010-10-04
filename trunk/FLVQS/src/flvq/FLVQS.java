@@ -35,6 +35,15 @@ public class FLVQS {
 		epocas = Integer.MAX_VALUE;
 	}
 	
+	public FLVQS(double parametroFuzificacao, double aprendizagem, int epocas) throws IOException{
+		lvq = new LVQ(aprendizagem);
+		m = parametroFuzificacao;
+		this.aprendizagem = aprendizagem;
+		aprendizagemInicial = aprendizagem;
+		this.epocas = epocas;
+		epoca = 0;
+	}
+	
 	public FLVQS(String nomeArquivo, double parametroFuzificacao, double aprendizagem, int epocas) throws IOException{
 		lvq = new LVQ(nomeArquivo, aprendizagem);
 		m = parametroFuzificacao;
@@ -74,6 +83,10 @@ public class FLVQS {
 	public FLVQS(String arquivoPesos, double m) throws IOException{
 		lvq = new LVQ(arquivoPesos);
 		this.m = m;
+	}
+	
+	public void setarDados(Vetor dados) {
+		this.lvq.setPesos(dados);
 	}
 	
 	public ArrayList<Double> extraiPertinencia(Dado dado){		
@@ -117,12 +130,12 @@ public class FLVQS {
 			atualizaAprendizagem();
 			atualizaMatrizPertinencia();
 			atualizaPesos();	
-			if(epoca == 8) lvq.getPesos().salvaArquivo(lvq.getNomeArquivo() + "_8", true);	
+//			if(epoca == 8) lvq.getPesos().salvaArquivo(lvq.getNomeArquivo() + "_8", true);	
 			epoca++;			
 		}while(epoca < epocas && mudancaInsatisfatoria());
 		System.out.println("Mudança máxima: " + mudanca);
 		System.out.println("Epoca: " + epoca);
-		lvq.getPesos().salvaArquivo(lvq.getNomeArquivo(), true);		
+//		lvq.getPesos().salvaArquivo(lvq.getNomeArquivo(), true);		
 	}
 	
 	private void criaMatrizPertinencia(){		
@@ -203,7 +216,6 @@ public class FLVQS {
 		}
 		return false;
 	}
-	
 
 	public static void main(String args[]){
 		try{

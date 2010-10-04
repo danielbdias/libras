@@ -3,6 +3,7 @@ package flvq;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class FLVQ {
 	private Vetor dados;
@@ -30,6 +31,17 @@ public class FLVQ {
 		else 
 			if(mInicial == mFinal) this.nomeArquivo = nomeArquivo.replace(".", "-flm.");
 			else this.nomeArquivo = nomeArquivo.replace(".", "-fld.");
+		epoca = 1;
+		this.epocas = epocas;
+	}
+	
+	public FLVQ(int numeroDeClusters, double parametroDeFuzificacaoInicial, double parametroDeFuzificacaoFinal, double epocas, double erro) throws IOException{
+		M = new Vetor(numeroDeClusters, dados.dimensao(), dados.min(), dados.max());
+		m = parametroDeFuzificacaoInicial;
+		mInicial = parametroDeFuzificacaoInicial;
+		mFinal = parametroDeFuzificacaoFinal;
+		this.erro = erro;
+		this.numeroDeClusters = numeroDeClusters;
 		epoca = 1;
 		this.epocas = epocas;
 	}
@@ -73,6 +85,12 @@ public class FLVQ {
 		numeroDeClusters = M.tamanho();
 	}
 	
+	public FLVQ(Vetor dados, Vetor m) throws IOException{
+		this.dados = dados;
+		M = m;
+		numeroDeClusters = M.tamanho();
+	}
+	
 	public FLVQ(String nomeM) throws IOException{		
 		M = new Vetor(nomeM, false);
 		numeroDeClusters = M.tamanho();
@@ -84,18 +102,22 @@ public class FLVQ {
 		}
 	}
 	
-	public void clusteriza(){
-		criaMatrizPertinencia();
-		do{
-			atualizaParametroFuzificacao();
-			atualizaMatrizPertinencia();
-			atualizaMatrizPrototipos();	
-			if(epoca == 8) M.salvaArquivo(nomeArquivo + "_8", false);
-			epoca++;
-		}while(erroInsatisfatorio() && epoca < epocas);
-		System.out.println("Epocas: " + epoca);
-		M.salvaArquivo(nomeArquivo, false);
+	public void setaDados(List<Double[]> dadosIniciais, List<String> classes) throws Exception {
+		this.dados = new Vetor(dadosIniciais, classes, true);
 	}
+	
+//	public void clusteriza(){
+//		criaMatrizPertinencia();
+//		do{
+//			atualizaParametroFuzificacao();
+//			atualizaMatrizPertinencia();
+//			atualizaMatrizPrototipos();	
+//			if(epoca == 8) M.salvaArquivo(nomeArquivo + "_8", false);
+//			epoca++;
+//		}while(erroInsatisfatorio() && epoca < epocas);
+//		System.out.println("Epocas: " + epoca);
+//		M.salvaArquivo(nomeArquivo, false);
+//	}
 	
 	public void clusteriza(String nome){
 		criaMatrizPertinencia();
@@ -106,6 +128,19 @@ public class FLVQ {
 			epoca++;
 		}while(erroInsatisfatorio() && epoca < epocas);
 		M.salvaArquivo(nome, false);
+	}
+	
+	public Vetor clusteriza(){
+		criaMatrizPertinencia();
+		
+		do{
+			atualizaParametroFuzificacao();
+			atualizaMatrizPertinencia();
+			atualizaMatrizPrototipos();			
+			epoca++;
+		}while(erroInsatisfatorio() && epoca < epocas);
+		
+		return M;
 	}
 	
 	private void atualizaParametroFuzificacao(){
