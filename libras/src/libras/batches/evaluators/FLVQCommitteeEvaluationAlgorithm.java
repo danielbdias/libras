@@ -83,11 +83,9 @@ public class FLVQCommitteeEvaluationAlgorithm implements
 			
 			FLVQS network = supervisedLayer[i];
 			
-			network.setarDados(cluster);
+			network.setarPesos(cluster);
 			
 			network.treina();
-			
-//			Teste testeCamada = null;
 		}
 	}
 	
