@@ -36,7 +36,7 @@ public class FLVQ {
 	}
 	
 	public FLVQ(int numeroDeClusters, double parametroDeFuzificacaoInicial, double parametroDeFuzificacaoFinal, double epocas, double erro) throws IOException{
-		M = new Vetor(numeroDeClusters, dados.dimensao(), dados.min(), dados.max());
+		
 		m = parametroDeFuzificacaoInicial;
 		mInicial = parametroDeFuzificacaoInicial;
 		mFinal = parametroDeFuzificacaoFinal;
@@ -104,6 +104,7 @@ public class FLVQ {
 	
 	public void setaDados(List<Double[]> dadosIniciais, List<String> classes) throws Exception {
 		this.dados = new Vetor(dadosIniciais, classes, true);
+		this.M = new Vetor(numeroDeClusters, dados.dimensao(), dados.min(), dados.max());
 	}
 	
 //	public void clusteriza(){

@@ -83,15 +83,32 @@ public class FLVQCommitteeEvaluationAlgorithm implements
 			
 			FLVQS network = supervisedLayer[i];
 			
-			network.setarPesos(cluster);
+			network.setarDadosIniciais(cluster);
 			
-			network.treina();
+			network.treina();			
 		}
 	}
 	
 	private List<String> validateCommittee(Pair<FLVQ, FLVQS[]> committee,
-			List<Double[]> evaluationData, List<String> evaluationDataLabels) {
+			List<Double[]> evaluationData, List<String> evaluationDataLabels) throws Exception {
 		
+		FLVQ unsupervisedLayer = committee.getFirstElement();
+		unsupervisedLayer.setaDados(evaluationData, evaluationDataLabels);
+		
+		unsupervisedLayer.clusteriza();
+		
+		Vetor[] clusters = unsupervisedLayer.separaDados();
+		
+		FLVQS[] supervisedLayer = committee.getSecondElement();
+		
+		for (int i = 0; i < supervisedLayer.length; i++) {
+			Vetor cluster = clusters[i];
+			
+			FLVQS network = supervisedLayer[i];
+			
+			Teste teste = new Teste(network.obterPesos(), cluster);
+			teste.testar();
+		}
 		
 		// TODO Auto-generated method stub
 		return null;

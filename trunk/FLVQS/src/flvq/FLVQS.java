@@ -85,8 +85,12 @@ public class FLVQS {
 		this.m = m;
 	}
 	
-	public void setarPesos(Vetor dados) {
-		this.lvq.setPesos(dados);
+	public void setarDadosIniciais(Vetor dados) {
+		this.lvq.setarDadosIniciais(dados);
+	}
+	
+	public Vetor obterPesos() {
+		return this.lvq.getPesos();
 	}
 	
 	public ArrayList<Double> extraiPertinencia(Dado dado){		

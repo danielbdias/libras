@@ -141,13 +141,17 @@ public class LVQ {
 	}
 	
 	public LVQ(String nomeArquivo, double aprendizagemInicial) throws IOException{
-		this.nomeArquivo = nomeArquivo.replace(".", "-flvq.");
-		dados = new Vetor(nomeArquivo, true);
-		ArrayList<String> classe = dados.retornaClasses();
-		//pedeNumeroDeNeuronios(classe);
-		nroNeuronioPorClasse(classe, 1);
-		pesos = new Vetor(classes, dados.dimensao(), dados.min(), dados.max());
-		//pesos = new Vetor(classes, dados);
+		if (nomeArquivo != null) {
+			this.nomeArquivo = nomeArquivo.replace(".", "-flvq.");
+			dados = new Vetor(nomeArquivo, true);
+			pesos = new Vetor(classes, dados.dimensao(), dados.min(), dados
+					.max());
+			ArrayList<String> classe = dados.retornaClasses();
+			//pedeNumeroDeNeuronios(classe);
+			nroNeuronioPorClasse(classe, 1);
+			pesos = new Vetor(classes, dados);
+		}
+		
 		aprendizagem = aprendizagemInicial;
 	}
 	
@@ -203,6 +207,14 @@ public class LVQ {
 		pesos = new Vetor(arqPesos, true);
 		ArrayList<String> classe = pesos.retornaClasses();
 		nroNeuronioPorClasse(classe, 1);
+	}
+	
+	public void setarDadosIniciais(Vetor dados) {
+		ArrayList<String> classe = dados.retornaClasses();
+		nroNeuronioPorClasse(classe, 1);
+		
+		this.dados = dados;
+		this.pesos = new Vetor(this.classes, dados.dimensao(), dados.min(), dados.max());
 	}
 	
 	public void treina(){		
