@@ -27,17 +27,10 @@ public class TestAction extends Action
 	{
 		//extractRepresentation();
 		//normalizeRepresentationBySampling();
-		//normalizeRepresentationByDimension();
+		normalizeRepresentationByDimension();
 		//normalizeRepresentationByData();
 		//normalizeRepresentationByPosition();
 		//concatFiles();
-		
-		libras.images.Image image = libras.images.utils.ImageHelper.getImage(
-			new File("D:\\Daniel Documents\\frame0000.jpg"));
-		
-		File f = new File("D:\\Daniel Documents\\teste.jpg");
-		
-		libras.images.utils.ImageHelper.buildImage(image, f);
 	}
 
 	protected void concatFiles() {
@@ -267,7 +260,7 @@ public class TestAction extends Action
 	}
 	
 	private void generateActionsForNormalizationByDimension(
-			String[] representationDirs, String[] normalizationDirs, String[] files,
+			String[] representationDirs, String[] normalizationDirs, String[] files, String[] normalizedFileNames,
 			LinkedList<NormalizeRepresentationByDimensionChainAction> list) {
 		
 		for (int i = 0; i < representationDirs.length; i++) {
@@ -276,7 +269,7 @@ public class TestAction extends Action
 			
 			for (int j = 0; j < files.length; j++) {
 				representationFiles[j] = new File(representationDirs[i] + files[j]);
-				normalizedFiles[j] = new File(normalizationDirs[i] + files[j]);
+				normalizedFiles[j] = new File(normalizationDirs[i] + normalizedFileNames[j]);
 				
 				if (!normalizedFiles[j].getParentFile().exists())
 					normalizedFiles[j].getParentFile().mkdirs();
@@ -293,47 +286,28 @@ public class TestAction extends Action
 	protected void normalizeRepresentationByDimension() {
 		
 		String[] representationDirs = {
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - coordenadas)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - ângulo abcissa)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - ângulo abcissa + ordenada)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - coordenadas + ângulo abcissa)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - coordenadas + ângulo abcissa + ordenada)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - coordenadas + velocidade instantânea)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - coordenadas + velocidade angular)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - coordenadas + velocidade instantânea + angular)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - ângulo abcissa + velocidade angular)",
-				"H:\\TCC\\Base de dados normalizada (por tempo)\\Base de dados (representação - ângulo abcissa + ordenada + velocidade angular)",
+				"D:\\Development\\Eclipse Workspaces\\Academic\\IC\\databases\\normalized by dimension",
+				"D:\\Development\\Eclipse Workspaces\\Academic\\IC\\databases\\normalized by dimension and position",
+				"D:\\Development\\Eclipse Workspaces\\Academic\\IC\\databases\\normalized by data",
 			};
 		
 		String[] normalizationDirs = {
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - coordenadas)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - ângulo abcissa)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - ângulo abcissa + ordenada)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - coordenadas + ângulo abcissa)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - coordenadas + ângulo abcissa + ordenada)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - coordenadas + velocidade instantânea)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - coordenadas + velocidade angular)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - coordenadas + velocidade instantânea + angular)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - ângulo abcissa + velocidade angular)",
-				"H:\\TCC\\Base de dados normalizada (por dimensão)\\Base de dados (representação - ângulo abcissa + ordenada + velocidade angular)",
+				"D:\\Development\\Eclipse Workspaces\\Academic\\IC\\databases\\normalized by dimension",
+				"D:\\Development\\Eclipse Workspaces\\Academic\\IC\\databases\\normalized by dimension and position",
+				"D:\\Development\\Eclipse Workspaces\\Academic\\IC\\databases\\normalized by data",
 			};
 		
 		String[] files = {
-			"\\IC\\Daniel.txt",
-			"\\IC\\Roberta.txt",
-			"\\IC\\Sara.txt",
-			"\\IC\\Videos - Sara.txt",
-			"\\IC\\Videos - todos.txt",
-			"\\TCC\\Alex.txt",
-			"\\TCC\\Daniel.txt",
-			"\\TCC\\Lucas.txt",
-			"\\TCC\\Márcia.txt",
-			"\\TCC\\Mirian.txt"
+			"\\fourier.data",
 		};
+		
+		String[] normalizationFiles = {
+				"\\fourier_normalized.data",
+			};
 		
 		LinkedList<NormalizeRepresentationByDimensionChainAction> list = new LinkedList<NormalizeRepresentationByDimensionChainAction>();
 		
-		generateActionsForNormalizationByDimension(representationDirs, normalizationDirs, files, list);
+		generateActionsForNormalizationByDimension(representationDirs, normalizationDirs, files, normalizationFiles, list);
 		
 		list.getFirst().executeAction();
 		

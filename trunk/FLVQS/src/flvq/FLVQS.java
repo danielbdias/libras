@@ -85,7 +85,7 @@ public class FLVQS {
 		this.m = m;
 	}
 	
-	public void setarDados(Vetor dados) {
+	public void setarPesos(Vetor dados) {
 		this.lvq.setPesos(dados);
 	}
 	

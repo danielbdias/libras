@@ -1,4 +1,4 @@
 %Pasta dos arquivos
-root_dir = 'H:\TCC\Base de dados normalizada (por posição)\';
+root_dir = 'D:\Development\Eclipse Workspaces\Academic\IC\databases\normalized by dimension and position\';
 %Tamanho da SOM
 som_size = [ 35, 35 ];
