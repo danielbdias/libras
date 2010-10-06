@@ -47,6 +47,9 @@ public class Vetor implements Iterable<Dado>{
 			
 			v.add(new Dado(dadoInicialComoList, classe));
 		}
+	
+		tamanho = v.size();
+		dimensao = v.get(0).getV().size();
 	}
 	
 	public Vetor(int tamanho, int dimensao, double min, double max){

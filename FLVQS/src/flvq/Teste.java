@@ -43,6 +43,28 @@ public class Teste {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public Teste(Vetor pesos, Vetor dados) throws IOException{
+		this.dados = dados;
+		this.pesos = pesos;
+		classesPesos = new ArrayList<String>();
+		classesDados = new ArrayList<String>();
+		neuroniosNaoUtilizados = new ArrayList<String>();
+		for(Dado peso : pesos){
+			if(!classesPesos.contains(peso.getCl()))
+				classesPesos.add(peso.getCl());
+		}
+		Collections.sort(classesPesos);
+		for(Dado dado : dados){
+			if(!classesDados.contains(dado.getCl()))
+				classesDados.add(dado.getCl());
+		}
+		Collections.sort(classesDados);
+		erros = new ArrayList[63];
+		erros2 = new ArrayList[63];
+		inicializaErros();
+	}
+	
+	@SuppressWarnings("unchecked")
 	public Teste(String arqPesos, Vetor dados) throws IOException{
 		this.dados = dados;
 		pesos = new Vetor(arqPesos, true);
@@ -284,5 +306,15 @@ public class Teste {
 		return classeSeparada;
 	}
 	
-	
+	public String[][] testar() throws Exception{
+		String[][] retorno = new String[this.dados.tamanho()][];
+		
+		for(int i = 0; i < dados.tamanho(); i++){
+			int escolhido = OpVetor.minimo(dados.get(i).getV(), pesos);
+
+			retorno[i] = new String[] { dados.get(i).getCl(), pesos.get(escolhido).getCl()};
+		}
+		
+		return retorno;
+	}
 }
