@@ -7,6 +7,8 @@ import java.io.*;
 import java.util.*;
 
 import libras.batches.evaluators.IEvaluationAlgorithm;
+import libras.batches.outputfiles.OutputDataFileManager;
+import libras.batches.outputfiles.models.OutputData;
 import libras.batches.taskfiles.models.Task;
 import libras.batches.taskfiles.models.TaskFile;
 import libras.batches.validators.IValidationAlgorithm;
@@ -105,33 +107,8 @@ public class BatchProcessor
 		
 		hitTax /= computedOutput.size();
 		
-		File directory = task.getOutputReportFile().getParentFile();
-		if (!directory.exists()) directory.mkdirs();
+		OutputData data = new OutputData(task.getName(), hitTax, expectedOutput, computedOutput);
 		
-		FileWriter writer = new FileWriter(task.getOutputReportFile());
-		
-		writer.write("<reportFile>\r\n");
-		
-		writer.write(String.format("\t<batchName>%s</batchName>\r\n", task.getName()));
-		writer.write(String.format("\t<hitTax>%f</hitTax>\r\n", hitTax));
-//		writer.write(String.format("\t<learningRate>%f</learningRate>\r\n", batchItem.getInitialLearningRate()));
-//		writer.write(String.format("\t<learningRateDecreaseTax>%f</learningRateDecreaseTax>\r\n", batchItem.getLearningRateDecreasingRate()));
-//		writer.write(String.format("\t<epochs>%d</epochs>\r\n", batchItem.getEpochsToExecute()));
-		
-		writer.write("\t<tests size=\"" + computedOutput.size() + "\">\r\n");
-		
-		for (int i = 0; i < computedOutput.size(); i++)
-		{
-			writer.write("\t\t<test>\r\n");
-			writer.write("\t\t\t<expectedLabel>" + expectedOutput.get(i) + "</expectedLabel>\r\n");
-			writer.write("\t\t\t<computedLabel>" + computedOutput.get(i) + "</computedLabel>\r\n");
-			writer.write("\t\t</test>\r\n");
-		}
-		
-		writer.write("\t</tests>\r\n");
-		
-		writer.write("</reportFile>\r\n");
-		
-		writer.close();
+		OutputDataFileManager.createFile(data, task.getOutputReportFile());
 	}
 }

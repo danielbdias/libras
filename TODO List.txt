@@ -1,5 +1,5 @@
 Automação dos testes
-  - automação da FLVQ
+  + automação da FLVQ
   + automação da LVQ
   - automação da SOM
   
@@ -9,10 +9,10 @@ Heurística de parâmetros
   - LVQ
   
 Avaliação das técnicas
-  - taxa de acerto médio
-  - desvio padrão
+  + taxa de acerto médio
+  + desvio padrão
   - grau de confiança
-  - matriz de confusão
+  + matriz de confusão
 
 Medidores de clusterização
   - erro de quantização
