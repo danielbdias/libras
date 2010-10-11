@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <batch>
-	<task name="Instance01_SOM_Test01">
+	<task name="Instance01_FLVQCommittee_Test01">
 		<inputData>
 			<labels>1,2,3</labels>
-			<file name="D:\Daniel Documents\Facul\TCC\Batchs\inputData.txt" />
+			<file name="D:\Development\Eclipse Workspaces\Academic\IC\samples\inputData.txt" />
 		</inputData>
 		<validationMethod>
 			<kFoldCrossValidation K="3" foldSize="5" />
 		</validationMethod>
 		<evaluationMethod>
 			<flvqCommittee>
-				<networkSetup fromFile="D:\Daniel Documents\Facul\TCC\Batchs\networkSetup.txt" />
+				<networkSetup fromFile="D:\Development\Eclipse Workspaces\Academic\IC\samples\networkSetup.txt" />
 				<networkTraining>
 					<unsupervisedTraining 
-						epochs="30" numberOfClusters="15" initialFuzzyficationParameter="1.3" finalFuzzyficationParameter="1.01" error="0.001" />
+						epochs="30" numberOfClusters="2" initialFuzzyficationParameter="1.3" finalFuzzyficationParameter="1.01" error="0.001" />
 					<supervisedTraining 
 						epochs="70" fuzzyficationParameter="1.1" learningRate="0.3" />
 				</networkTraining>
 			</flvqCommittee>
 		</evaluationMethod>
 		<outputData>
-			<reportFile name="D:\Daniel Documents\Facul\TCC\Batchs\output.xml" />
+			<reportFile name="D:\Development\Eclipse Workspaces\Academic\IC\samples\output.xml" />
 		</outputData>
 	</task>
 </batch>

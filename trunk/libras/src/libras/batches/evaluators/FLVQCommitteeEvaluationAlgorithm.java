@@ -1,6 +1,7 @@
 package libras.batches.evaluators;
 
 import java.util.*;
+
 import flvq.*;
 
 import libras.batches.taskfiles.evaluationmethods.models.FLVQCommitteeEvaluationMethod;
@@ -72,11 +73,13 @@ public class FLVQCommitteeEvaluationAlgorithm implements
 		FLVQ unsupervisedLayer = committee.getFirstElement();
 		unsupervisedLayer.setaDados(trainData, trainDataLabels);
 		
-		unsupervisedLayer.clusteriza();
+		FLVQS[] supervisedLayer = committee.getSecondElement();
+		
+		for (int i = 0; i < supervisedLayer.length; i++) {
+			unsupervisedLayer.clusteriza();	
+		}
 		
 		Vetor[] clusters = unsupervisedLayer.separaDados();
-		
-		FLVQS[] supervisedLayer = committee.getSecondElement();
 		
 		for (int i = 0; i < supervisedLayer.length; i++) {
 			Vetor cluster = clusters[i];
@@ -92,25 +95,28 @@ public class FLVQCommitteeEvaluationAlgorithm implements
 	private List<String> validateCommittee(Pair<FLVQ, FLVQS[]> committee,
 			List<Double[]> evaluationData, List<String> evaluationDataLabels) throws Exception {
 		
+		List<String> computedLabels = new ArrayList<String>();
+		
 		FLVQ unsupervisedLayer = committee.getFirstElement();
-		unsupervisedLayer.setaDados(evaluationData, evaluationDataLabels);
-		
-		unsupervisedLayer.clusteriza();
-		
-		Vetor[] clusters = unsupervisedLayer.separaDados();
 		
 		FLVQS[] supervisedLayer = committee.getSecondElement();
 		
-		for (int i = 0; i < supervisedLayer.length; i++) {
-			Vetor cluster = clusters[i];
+		for (int i = 0; i < evaluationData.size(); i++) {
+			Double[] data = evaluationData.get(i);
 			
-			FLVQS network = supervisedLayer[i];
+			ArrayList<Double> dataAsArrayList = new ArrayList<Double>();
 			
-			Teste teste = new Teste(network.obterPesos(), cluster);
-			teste.testar();
+			for (int j = 0; j < data.length; j++)
+				dataAsArrayList.add(data[j]);
+			
+			int clusterIndex = unsupervisedLayer.defineCluster(new Dado(dataAsArrayList, evaluationDataLabels.get(i)));
+			
+			FLVQS network = supervisedLayer[clusterIndex];
+			
+			int escolhido = OpVetor.minimo(dataAsArrayList, network.obterPesos());
+			computedLabels.add(network.obterPesos().get(escolhido).getCl());
 		}
 		
-		// TODO Auto-generated method stub
-		return null;
+		return computedLabels;
 	}	
 }

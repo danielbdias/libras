@@ -1,5 +1,5 @@
 <reportFile>
-	<batchName>Instance01_SOM_Test01</batchName>
+	<batchName>Instance01_FLVQCommittee_Test01</batchName>
 	<hitTax>1,000000</hitTax>
 	<tests size="9">
 		<test>
