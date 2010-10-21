@@ -65,6 +65,13 @@ somMap = som_batchtrain(somMap, somData, 'train', somFineTuningTraining);
 somMap = som_autolabel(somMap, somData, 'vote');
 
 %Plot the U-Matrix
+
+colormap('gray');
 som_show(somMap, 'umat', 'all');
-som_show_add('label', somMap.labels);
+som_show_add('label', somMap.labels, 'textcolor', 'b');
 title(umatrix_title);
+
+figure(2);
+[color,b]=som_kmeanscolor(somMap,15);
+som_show(somMap,'color',color,'color',color(:,:,b));
+

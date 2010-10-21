@@ -5,7 +5,7 @@ package libras.ui.actions;
 
 /**
  * Represents an action performed by this program.
- * Every action made by the {@link libras.Program} class must use a subclass of this class.
+ * Every action made by the {@link libras.geneticalgorithms.Program} class must use a subclass of this class.
  */
 public abstract class Action
 {

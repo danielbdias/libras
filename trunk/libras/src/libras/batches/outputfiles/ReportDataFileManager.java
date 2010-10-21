@@ -14,8 +14,6 @@ public class ReportDataFileManager {
 		
 		writer.write("<report>\r\n");
 		
-		report.getConfusionMatrix();
-		
 		writer.write(String.format("\t<mean>%f</mean>\r\n", report.getHitRateMean()));
 		writer.write(String.format("\t<median>%f</median>\r\n", report.getHitRateMedian()));
 		writer.write(String.format("\t<variance>%f</variance>\r\n", report.getHitRateVariance()));

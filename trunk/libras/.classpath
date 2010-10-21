@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/libras.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/libras.videos"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/FLVQS"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libras.geneticalgorithms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
