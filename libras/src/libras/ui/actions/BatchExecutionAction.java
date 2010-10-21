@@ -35,7 +35,7 @@ public class BatchExecutionAction extends Action
 	/**
 	 * Creates a new instance of this action passing the batch file
 	 * with the configuration of the training
-	 * @param batchFile Batch file with the training parameters
+	 * @param taskFile Batch file with the training parameters
 	 */
 	public BatchExecutionAction(String taskFile) 
 	{
