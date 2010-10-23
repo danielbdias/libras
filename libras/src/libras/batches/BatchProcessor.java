@@ -21,6 +21,16 @@ import libras.utils.*;
  */
 public class BatchProcessor
 {
+	public BatchProcessor() {
+		this(null);
+	}
+	
+	public BatchProcessor(IBatchProcessorObserver observer) {
+		this.observer = observer;
+	}
+	
+	private IBatchProcessorObserver observer = null;
+	
 	/**
 	 * Process a batch file, executing the training and validation of each item of a batch file.
 	 * @param batch Batch file to be processed.
@@ -43,6 +53,8 @@ public class BatchProcessor
 			{
 				results[i] = new BatchTaskResult(e, item.getName());
 			}
+			
+			if (this.observer != null) this.observer.receiveResult(results[i], item);
 		}
 		
 		return results;

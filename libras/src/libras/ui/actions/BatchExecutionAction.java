@@ -3,10 +3,15 @@
  */
 package libras.ui.actions;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import libras.batches.*;
 import libras.batches.taskfiles.TaskFileParser;
+import libras.batches.taskfiles.models.Task;
 import libras.batches.taskfiles.models.TaskFile;
 import libras.ui.actions.annotations.ActionDescription;
 
@@ -16,11 +21,11 @@ import libras.ui.actions.annotations.ActionDescription;
  */
 @ActionDescription(
 	command="batchexec",
-	commandExample="batchexec -file=[taskfile_path]",
+	commandExample="batchexec -dir=[taskfiledir_path]",
 	helpDescription="Executes a batch based in a task file script with various tasks.",
-	requiredArgs={ "file" },
+	requiredArgs={ "dir" },
 	needUserInput=true)
-public class BatchExecutionAction extends Action
+public class BatchExecutionAction extends Action implements IBatchProcessorObserver
 {
 	/**
 	 * Creates a new instance of this action passing the batch file
@@ -29,7 +34,7 @@ public class BatchExecutionAction extends Action
 	 */
 	public BatchExecutionAction(Hashtable<String, String> arguments) 
 	{
-		this(arguments.get("file"));
+		this(arguments.get("dir"));
 	}
 	
 	/**
@@ -37,12 +42,12 @@ public class BatchExecutionAction extends Action
 	 * with the configuration of the training
 	 * @param taskFile Batch file with the training parameters
 	 */
-	public BatchExecutionAction(String taskFile) 
+	public BatchExecutionAction(String dir) 
 	{
-		this.taskFile = taskFile;
+		this.dir = dir;
 	}
 	
-	private String taskFile = null;
+	private String dir = null;
 	
 	/**
 	 * Executes the batch training.
@@ -50,6 +55,48 @@ public class BatchExecutionAction extends Action
 	 */
 	public void execute() throws Exception
 	{
+		List<File> filesToExecute = this.getFilesToExecute(this.dir);
+		
+		for (File file : filesToExecute) {
+			executeTaskFile(file);	
+		}	
+	}
+
+	private List<File> getFilesToExecute(String dirPath) {
+		File dir = new File(dirPath);
+		
+		List<File> files = new ArrayList<File>();
+		
+		this.getFilesToExecuteRecursive(dir, files);
+		
+		return files;
+	}
+	
+	private void getFilesToExecuteRecursive(File dir, List<File> files) {
+		File[] dirs = dir.listFiles(
+				new FileFilter() {
+					@Override
+					public boolean accept(File arg) {
+						return arg.isDirectory();
+					}
+				});
+		
+		for (File subDir : dirs)
+			this.getFilesToExecuteRecursive(subDir, files);
+		
+		File[] outputFiles = dir.listFiles(
+				new FileFilter() {
+					@Override
+					public boolean accept(File arg) {
+						return arg.getName().endsWith(".xml");
+					}
+				});
+		
+		for (File file : outputFiles)
+			files.add(file);
+	}
+	
+	private void executeTaskFile(File taskFile) throws Exception {
 		System.out.printf("Executing batch: [%s] ...\r\n", taskFile);
 		
 		TaskFile batch = null;
@@ -57,7 +104,7 @@ public class BatchExecutionAction extends Action
 		try
 		{
 			TaskFileParser parser = new TaskFileParser();
-			batch = parser.parseFile(taskFile);
+			batch = parser.parseFile(taskFile.getAbsolutePath());
 		}
 		catch (Exception e)
 		{
@@ -67,39 +114,50 @@ public class BatchExecutionAction extends Action
 		
 		if (taskFile != null)
 		{
-			BatchProcessor processor = new BatchProcessor();
+			BatchProcessor processor = new BatchProcessor(this);
 			
 			BatchTaskResult[] results = processor.process(batch);
+			
+			int successfulTasks = 0;
 			
 			for (int i = 0; i < results.length; i++)
 			{
 				BatchTaskResult result = results[i];
 				
-				System.out.printf("%d - Item [%s] completed ", i+1, result.getBatchItem());
-				
 				if (result.isCompleted())
-				{
-					System.out.printf("without errors.\r\n");
-				}
-				else
-				{
-					System.out.printf("with errors.\r\n");
-					System.out.printf("Error: %s \r\n", result.getError().toString());
-					result.getError().printStackTrace(System.out);
-					System.out.println();
-					
-					Throwable err = (Throwable) result.getError();
-					
-					while((err = err.getCause()) != null)
-					{
-						System.out.printf("Cause: %s \r\n", err.toString());
-						err.printStackTrace(System.out);
-						System.out.println();
-					}
-				}
+					successfulTasks++;
 			}
+			
+			System.out.printf("%d of %d items executed with success.", successfulTasks, results.length);
+			System.out.println();
 		}
 		
 		System.out.println("Batch executed.");
+	}
+	
+	@Override
+	public void receiveResult(BatchTaskResult result, Task item) {
+		System.out.printf("Item [%s] completed ", result.getBatchItem());
+		
+		if (result.isCompleted())
+		{
+			System.out.printf("without errors.\r\n");
+		}
+		else
+		{
+			System.out.printf("with errors.\r\n");
+			System.out.printf("Error: %s \r\n", result.getError().toString());
+			result.getError().printStackTrace(System.out);
+			System.out.println();
+			
+			Throwable err = (Throwable) result.getError();
+			
+			while((err = err.getCause()) != null)
+			{
+				System.out.printf("Cause: %s \r\n", err.toString());
+				err.printStackTrace(System.out);
+				System.out.println();
+			}
+		}
 	}
 }

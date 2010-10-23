@@ -137,8 +137,8 @@ public class FLVQS {
 //			if(epoca == 8) lvq.getPesos().salvaArquivo(lvq.getNomeArquivo() + "_8", true);	
 			epoca++;			
 		}while(epoca < epocas && mudancaInsatisfatoria());
-		System.out.println("Mudança máxima: " + mudanca);
-		System.out.println("Epoca: " + epoca);
+//		System.out.println("Mudança máxima: " + mudanca);
+//		System.out.println("Epoca: " + epoca);
 //		lvq.getPesos().salvaArquivo(lvq.getNomeArquivo(), true);		
 	}
 	
