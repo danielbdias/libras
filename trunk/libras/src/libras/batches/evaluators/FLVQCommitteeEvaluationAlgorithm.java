@@ -84,11 +84,11 @@ public class FLVQCommitteeEvaluationAlgorithm implements
 		for (int i = 0; i < supervisedLayer.length; i++) {
 			Vetor cluster = clusters[i];
 			
-			FLVQS network = supervisedLayer[i];
-			
-			network.setarDadosIniciais(cluster);
-			
-			network.treina();			
+			if (cluster.tamanho() > 0) {
+				FLVQS network = supervisedLayer[i];
+				network.setarDadosIniciais(cluster);
+				network.treina();
+			}			
 		}
 	}
 	

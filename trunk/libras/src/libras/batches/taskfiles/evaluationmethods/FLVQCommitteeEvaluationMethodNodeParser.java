@@ -36,23 +36,22 @@ public class FLVQCommitteeEvaluationMethodNodeParser extends
 		
 		Node networkSetupNode = XmlHelper.getNodeFromList(NETWORK_SETUP_NODE_NAME, node.getChildNodes());
 		
-		XmlHelper.validateIfNodeExists(networkSetupNode, NETWORK_SETUP_NODE_NAME, 
-			String.format("The \"%s\" node of the %s must exists and cannot be empty.", NETWORK_SETUP_NODE_NAME, NODE_NAME));
-		
-		XmlHelper.validateIfAttributeExists(networkSetupNode, "fromFile", 
-				String.format("The \"%s\" node of the %s must have an attribute named \"%s\".",
-						NETWORK_SETUP_NODE_NAME, NODE_NAME, "fromFile"));
-		
-		String networkSetupFile = XmlHelper.getAttributeValueFromNode("fromFile", networkSetupNode);
-		
-		File file = new File(networkSetupFile);
-		
-		if (!file.exists())
-			throw new Exception(
-				String.format("The \"%s\" node of the %s must have a valid file.",
-						NETWORK_SETUP_NODE_NAME, NODE_NAME));
-		
-		evaluationMethod.setNetworkSetupFile(file);
+		if (networkSetupNode != null) {
+			XmlHelper.validateIfNodeExists(networkSetupNode, NETWORK_SETUP_NODE_NAME, 
+					String.format("The \"%s\" node of the %s must exists and cannot be empty.", NETWORK_SETUP_NODE_NAME, NODE_NAME));
+			
+			XmlHelper.validateIfAttributeExists(networkSetupNode, "fromFile", 
+					String.format("The \"%s\" node of the %s must have an attribute named \"%s\".", NETWORK_SETUP_NODE_NAME, NODE_NAME, "fromFile"));
+			
+			String networkSetupFile = XmlHelper.getAttributeValueFromNode("fromFile", networkSetupNode);
+			
+			File file = new File(networkSetupFile);
+			
+			if (!file.exists())
+				throw new Exception(String.format("The \"%s\" node of the %s must have a valid file.", NETWORK_SETUP_NODE_NAME, NODE_NAME));
+			
+			evaluationMethod.setNetworkSetupFile(file);
+		}
 	}
 
 	private void setUpSupervisedTrainingPhaseForEvaluationMethod(FLVQCommitteeEvaluationMethod evaluationMethod, Node node) throws Exception {
