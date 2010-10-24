@@ -5,35 +5,35 @@ function execute_som(file_path, representation_size, representation_labels, somR
 % Check to see if no input arguments were supplied.  If this is the case,
 % stop execution and output an error message to the user.
 if nargin < 7
-    error('MATLAB:convert_to_som_pak_format:NrInputArguments', 'No input arguments were supplied. At least five is expected.');
+    error('MATLAB:execute_som:NrInputArguments', 'No input arguments were supplied. At least five is expected.');
 elseif nargin <= 7
     if ~ischar(file_path)
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The first input variable must be a valid character array.');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The first input variable must be a valid character array.');
     end
     if strcmp(file_path, '') == 1
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The first input variable cannot be empty.');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The first input variable cannot be empty.');
     end
     
     if ~isnumeric(representation_size)
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The second input variable must be a valid number.');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The second input variable must be a valid number.');
     end
     if representation_size <= 0
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The second input variable must be greater than 0 (zero).');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The second input variable must be greater than 0 (zero).');
     end    
     
     if representation_size == length(representation_labels)
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The second input variable must be equal to the size of the third argument.');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The second input variable must be equal to the size of the third argument.');
     end
     
     if ~ischar(umatrix_title)
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The fifth input variable must be a valid character array.');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The fifth input variable must be a valid character array.');
     end
     if strcmp(umatrix_title, '') == 1
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The fifth input variable cannot be empty.');
+        error('MATLAB:execute_som:InvalidInputArgument', 'The fifth input variable cannot be empty.');
     end
     
 elseif nargin > 5
-    error('MATLAB:get_file_data:TooManyInputArguments', 'Too many input arguments were supplied. The maximum permitted is five.');
+    error('MATLAB:execute_som:TooManyInputArguments', 'Too many input arguments were supplied. The maximum permitted is five.');
 end
 
 %Get data struct from representation file
