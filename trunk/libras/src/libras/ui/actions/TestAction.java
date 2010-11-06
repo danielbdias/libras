@@ -27,12 +27,36 @@ public class TestAction extends Action
 	{
 		//extractRepresentation();
 		//normalizeRepresentationBySampling();
-		normalizeRepresentationByDimension();
+		//normalizeRepresentationByDimension();
 		//normalizeRepresentationByData();
 		//normalizeRepresentationByPosition();
 		//concatFiles();
+		generateReports();
 	}
 
+	protected void generateReports() {
+		String dirPath = "D:\\Development\\Eclipse Workspaces\\Academic\\IC\\batchReports\\flvq\\normalized by dimension" +
+				"";
+		
+		File dir = new File(dirPath);
+		
+		String[] subDirs = dir.list();
+		
+		for (int i = 0; i < subDirs.length; i++) {
+			String subDirPath = subDirs[i];
+			subDirPath = dirPath + "\\" + subDirPath;
+			
+			BatchReportingAction action = new BatchReportingAction(subDirPath, subDirPath + ".xml");
+			
+			try {
+				action.execute();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	protected void concatFiles() {
 		String[] dirs = {
 				"H:\\TCC\\Base de dados normalizada (por dado)\\Base de dados (representação - coordenadas)",

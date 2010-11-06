@@ -14,13 +14,19 @@ import libras.utils.*;
  */
 public class TrainDataFileReader
 {
+	private static Hashtable<String, List<Pair<String, double[]>>> _dataCache = null;
+	
+	static {
+		_dataCache = new Hashtable<String, List<Pair<String,double[]>>>();
+	}
+	
 	/**
 	 * Get class data from a text file to use in neural network training.
 	 * @param fileName File where the class data will be retrieved.
 	 * @return A list with all classes found in file.
 	 * @throws Exception When an unexpected exception occurs.
 	 */
-	public static List<String> getClassesFromFile(String fileName) throws Exception
+ 	public static List<String> getClassesFromFile(String fileName) throws Exception
 	{
 		ValidationHelper.validateIfParameterIsNullOrEmpty(fileName, "fileName");
 		
@@ -46,9 +52,12 @@ public class TrainDataFileReader
 	 * @return A list with all data found in file.
 	 * @throws Exception When an unexpected exception occurs.
 	 */
-	public static List<Pair<String, double[]>> getDataFromFile(String fileName) throws Exception
+	public static synchronized List<Pair<String, double[]>> getDataFromFile(String fileName) throws Exception
 	{	
 		ValidationHelper.validateIfParameterIsNullOrEmpty(fileName, "fileName");
+		
+		if (_dataCache.containsKey(fileName)) 
+			return _dataCache.get(fileName);
 		
 		File file = new File(fileName);
 		
@@ -88,6 +97,9 @@ public class TrainDataFileReader
 				}
 			}
 		}
+		
+		if (!_dataCache.containsKey(fileName))
+			_dataCache.put(fileName, inputData);
 		
 		return inputData;
 	}

@@ -61,8 +61,8 @@ public class BatchTrainingDirAction extends Action
 				
 				if (fileSystemEntry.isFile())
 				{
-					BatchExecutionAction action = new BatchExecutionAction(fileSystemEntry.getAbsolutePath());
-					action.execute();
+					//BatchExecutionAction action = new BatchExecutionAction(fileSystemEntry.getAbsolutePath());
+					//action.execute();
 				}
 				else if (fileSystemEntry.isDirectory())
 					this.processBatchFiles(batchDir + "\\" + item);
