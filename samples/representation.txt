@@ -1,0 +1,15 @@
+01 - arcos_antihorario
+02 - arcos_horario
+03 - balancar_curva
+04 - balancar_horizontal
+05 - balancar_vertical
+06 - circulos
+07 - curvas_inferior
+08 - curvas_superior
+09 - ondulatorio_horizontal
+10 - ondulatorio_vertical
+11 - reta_horizontal
+12 - reta_vertical
+13 - tremular
+14 - ziguezague_horizontal
+15 - ziguezague_vertical

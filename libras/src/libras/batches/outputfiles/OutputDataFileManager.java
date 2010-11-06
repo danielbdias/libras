@@ -33,7 +33,7 @@ public class OutputDataFileManager {
 		XPathExpression nameExpression = xpath.compile("//outputFile//batchName");
 		XPathExpression hitTaxExpression = xpath.compile("//outputFile//hitTax");
 		XPathExpression expectedLabelExpression = xpath.compile("//outputFile//tests/test/expectedLabel");
-		XPathExpression computedLabelExpression = xpath.compile("//outputFile//tests/test/expectedLabel");
+		XPathExpression computedLabelExpression = xpath.compile("//outputFile//tests/test/computedLabel");
 		
 		Node nameNode = (Node) nameExpression.evaluate(doc, XPathConstants.NODE);
 		Node hitTaxNode = (Node) hitTaxExpression.evaluate(doc, XPathConstants.NODE);
@@ -43,6 +43,8 @@ public class OutputDataFileManager {
 		outputData.setTaskName(nameNode.getTextContent());
 		
 		String hitTaxAsString = hitTaxNode.getTextContent();
+		hitTaxAsString = hitTaxAsString.replace(',', '.');
+		
 		outputData.setHitTax(Double.parseDouble(hitTaxAsString));
 		
 		for (int i = 0; i < expectedLabelNodeList.getLength(); i++) {

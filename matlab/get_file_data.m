@@ -19,6 +19,8 @@ elseif nargin > 2
     error('MATLAB:get_file_data:TooManyInputArguments', 'Too many input arguments were supplied.  The maximum permitted is two.');
 end
 
+display(['Reading data from file: ' file_path]);
+
 fid = fopen(file_path, 'r');
 
 if fid > 0
@@ -47,3 +49,5 @@ if fid > 0
 else
     error('MATLAB:get_file_data:UnableToOpenFile', 'The data file passed to the function cannot be opened.');
 end
+
+display(['File ' file_path ' read. ' num2str(line_count) ' lines obtained.']);

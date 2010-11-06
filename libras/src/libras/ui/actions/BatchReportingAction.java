@@ -107,12 +107,11 @@ public class BatchReportingAction extends Action {
 			}
 		}
 		
-		
 		return confusionMatrix;
 	}
 
 	private String[] findLabelsUsed(List<OutputData> data) {
-		Set<String> labels = new HashSet<String>();
+		Set<String> labels = new TreeSet<String>();
 		
 		for (int i = 0; i < data.size(); i++) {
 			OutputData outputData = data.get(i);
@@ -170,7 +169,7 @@ public class BatchReportingAction extends Action {
 					misses++;
 			}
 			
-			hitRates[i] = (double) hits / (double) hits + misses;
+			hitRates[i] = (double) hits / (double) (hits + misses);
 		}
 		
 		Arrays.sort(hitRates);

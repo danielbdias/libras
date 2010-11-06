@@ -21,10 +21,6 @@ elseif nargin <= 3
         error('MATLAB:get_file_data:InvalidInputArgument', 'The second input variable must be greater than 0 (zero).');
     end    
     
-    if representation_size == length(representation_labels)
-        error('MATLAB:get_file_data:InvalidInputArgument', 'The second input variable must be equal to the size of the third argument.');
-    end
-    
 elseif nargin > 3
     error('MATLAB:get_file_data:TooManyInputArguments', 'Too many input arguments were supplied. The maximum permitted is three.');
 end
@@ -37,7 +33,7 @@ cnames = cell(size(file_data, 2) - 1, 1);
 
 for i = 1:representation_size
     for j = 1:representation_size:length(cnames)
-        cnames(j) = cellstr([representation_labels(i) num2str((j+representation_size-i)/representation_size)]);
+        cnames(j) = cellstr([char(representation_labels(i)) num2str((j+representation_size-i)/representation_size)]);
     end    
 end
 

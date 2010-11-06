@@ -1,12 +1,14 @@
-function execute_som(file_path, representation_size, representation_labels, somRoughTrainingParams, somFineTuningTrainingParams, som_size, umatrix_title)
+function [qe, te, somMap] = execute_som(file_path, representation_size, representation_labels, somRoughTrainingParams, somFineTuningTrainingParams, som_size, umatrix_title)
 % EXECUTE_SOM - initialize, train and plot a SOM based in data of a 
 % representation file
-%
+
+generate_umatrix = 0;
+
 % Check to see if no input arguments were supplied.  If this is the case,
 % stop execution and output an error message to the user.
-if nargin < 7
-    error('MATLAB:execute_som:NrInputArguments', 'No input arguments were supplied. At least five is expected.');
-elseif nargin <= 7
+if nargin < 6
+    error('MATLAB:execute_som:NrInputArguments', 'No input arguments were supplied. At least six is expected.');
+elseif nargin <= 6 || nargin <=7
     if ~ischar(file_path)
         error('MATLAB:execute_som:InvalidInputArgument', 'The first input variable must be a valid character array.');
     end
@@ -20,20 +22,19 @@ elseif nargin <= 7
     if representation_size <= 0
         error('MATLAB:execute_som:InvalidInputArgument', 'The second input variable must be greater than 0 (zero).');
     end    
-    
-    if representation_size == length(representation_labels)
-        error('MATLAB:execute_som:InvalidInputArgument', 'The second input variable must be equal to the size of the third argument.');
+
+    if nargin > 6
+        generate_matrix = 1;
+        if ~ischar(umatrix_title)
+            error('MATLAB:execute_som:InvalidInputArgument', 'The fifth input variable must be a valid character array.');
+        end
+        if strcmp(umatrix_title, '') == 1
+            error('MATLAB:execute_som:InvalidInputArgument', 'The fifth input variable cannot be empty.');
+        end
     end
     
-    if ~ischar(umatrix_title)
-        error('MATLAB:execute_som:InvalidInputArgument', 'The fifth input variable must be a valid character array.');
-    end
-    if strcmp(umatrix_title, '') == 1
-        error('MATLAB:execute_som:InvalidInputArgument', 'The fifth input variable cannot be empty.');
-    end
-    
-elseif nargin > 5
-    error('MATLAB:execute_som:TooManyInputArguments', 'Too many input arguments were supplied. The maximum permitted is five.');
+elseif nargin > 7
+    error('MATLAB:execute_som:TooManyInputArguments', 'Too many input arguments were supplied. The maximum permitted is seven.');
 end
 
 %Get data struct from representation file
@@ -64,14 +65,17 @@ somMap = som_batchtrain(somMap, somData, 'train', somFineTuningTraining);
 %Label the map
 somMap = som_autolabel(somMap, somData, 'vote');
 
-%Plot the U-Matrix
+if (generate_umatrix == 1)
+    %Plot the U-Matrix
+    colormap('gray');
+    som_show(somMap, 'umat', 'all');
+    som_show_add('label', somMap.labels, 'textcolor', 'r');
+    title(umatrix_title);
+end
 
-colormap('gray');
-som_show(somMap, 'umat', 'all');
-som_show_add('label', somMap.labels, 'textcolor', 'b');
-title(umatrix_title);
+%figure(2);
+%[color,b]=som_kmeanscolor(somMap,15);
+%som_show(somMap,'color',color,'color',color(:,:,b));
 
-figure(2);
-[color,b]=som_kmeanscolor(somMap,15);
-som_show(somMap,'color',color,'color',color(:,:,b));
-
+%Measure error
+[qe,te] = som_quality(somMap, somData);

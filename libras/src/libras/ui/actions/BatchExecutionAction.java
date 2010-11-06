@@ -34,20 +34,17 @@ public class BatchExecutionAction extends Action implements IBatchProcessorObser
 	 */
 	public BatchExecutionAction(Hashtable<String, String> arguments) 
 	{
-		this(arguments.get("dir"));
-	}
-	
-	/**
-	 * Creates a new instance of this action passing the batch file
-	 * with the configuration of the training
-	 * @param taskFile Batch file with the training parameters
-	 */
-	public BatchExecutionAction(String dir) 
-	{
-		this.dir = dir;
+		this.dir = arguments.get("dir");
+		
+		if (arguments.containsKey("threads"))
+		{
+			String threadsAsString = arguments.get("threads");
+			this.threadsToUse = Integer.parseInt(threadsAsString);
+		}
 	}
 	
 	private String dir = null;
+	private int threadsToUse = 1;
 	
 	/**
 	 * Executes the batch training.
@@ -114,7 +111,7 @@ public class BatchExecutionAction extends Action implements IBatchProcessorObser
 		
 		if (taskFile != null)
 		{
-			BatchProcessor processor = new BatchProcessor(this);
+			BatchProcessor processor = new BatchProcessor(this, this.threadsToUse);
 			
 			BatchTaskResult[] results = processor.process(batch);
 			
@@ -124,7 +121,7 @@ public class BatchExecutionAction extends Action implements IBatchProcessorObser
 			{
 				BatchTaskResult result = results[i];
 				
-				if (result.isCompleted())
+				if (result != null && result.isCompleted())
 					successfulTasks++;
 			}
 			
@@ -137,26 +134,32 @@ public class BatchExecutionAction extends Action implements IBatchProcessorObser
 	
 	@Override
 	public void receiveResult(BatchTaskResult result, Task item) {
-		System.out.printf("Item [%s] completed ", result.getBatchItem());
+		System.out.printf("Item [%s] completed ", item.getName());
 		
-		if (result.isCompleted())
+		if (result != null && result.isCompleted())
 		{
 			System.out.printf("without errors.\r\n");
 		}
 		else
 		{
 			System.out.printf("with errors.\r\n");
-			System.out.printf("Error: %s \r\n", result.getError().toString());
-			result.getError().printStackTrace(System.out);
-			System.out.println();
 			
-			Throwable err = (Throwable) result.getError();
-			
-			while((err = err.getCause()) != null)
-			{
-				System.out.printf("Cause: %s \r\n", err.toString());
-				err.printStackTrace(System.out);
+			if (result != null) {
+				System.out.printf("Error: %s \r\n", result.getError().toString());
+				result.getError().printStackTrace(System.out);
 				System.out.println();
+				
+				Throwable err = (Throwable) result.getError();
+				
+				while((err = err.getCause()) != null)
+				{
+					System.out.printf("Cause: %s \r\n", err.toString());
+					err.printStackTrace(System.out);
+					System.out.println();
+				}
+			}
+			else {
+				System.out.printf("The result is null.\r\n");
 			}
 		}
 	}
